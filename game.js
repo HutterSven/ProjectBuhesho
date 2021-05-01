@@ -1,6 +1,7 @@
 var version = '0.0.1';
 var is_playing = false;
 var player;
+var enemy;
 var speed = 5;
 var bg_sprite = new Image();
 var player_sprite = new Image();
@@ -28,14 +29,16 @@ function init() {
 
     })();
     player = new Player();
+    enemy = new Enemy;
+
     load_media();
 }
 
 function load_media() {
     bg_sprite = new Image();
     bg_sprite.src = 'images/bg_sprite.jpg';
-    player_sprite = new Image();
-    player_sprite.src = 'images/ship_sprite.png';
+    main_sprite = new Image();
+    main_sprite.src = 'images/main_sprite.png';
 }
 
 function mouse(e) {
@@ -51,6 +54,10 @@ function Player() {
     this.drawY = 300;
     this.bg_X = -400;
     this.bg_Y = -400;
+    this.srcY = 221;
+    this.srcX = 62;
+    this.width = 21;
+    this.heigth = 23;
     this.speed = 6;
     this.is_downkey = false;
     this.is_upkey = false;
@@ -60,7 +67,7 @@ function Player() {
 
 Player.prototype.draw = function(){
     this.check_keys();
-    main_ctx.drawImage(player_sprite, this.drawX, this.drawY);
+    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
 }
 
 Player.prototype.check_keys = function (){
@@ -94,9 +101,35 @@ Player.prototype.check_keys = function (){
 
 }
 
+function Enemy() {
+    this.drawX = 830;
+    this.drawY = 300;
+    this.srcY = 176;
+    this.srcX = 15;
+    this.width = 19;
+    this.heigth = 16;
+    this.speed = 1;
+}
+
+Enemy.prototype.draw = function(){
+    this.ai();
+    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+}
+
+Enemy.prototype.ai = function () {
+    this.drawX -= this.speed;
+}
+
+function spawn_enemy(n) {
+    for (var i = 0; i < n; i++){
+
+    }
+}
+
 function loop(){
     main_ctx.clearRect(0,0,800,600);
     player.draw();
+    enemy.draw();
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
     if (is_playing)
         requestaframe(loop);
