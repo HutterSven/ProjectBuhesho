@@ -313,6 +313,12 @@ function loop(){
     }
 
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
+    background_ctx.drawImage(bg_sprite, player.bg_X+800, player.bg_Y);
+
+    player.bg_X -= 8;
+
+    if (player.bg_X < -800) player.bg_X = 0;
+
     if (is_playing)
         requestaframe(loop);
 }
