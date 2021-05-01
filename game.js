@@ -4,7 +4,7 @@ var player;
 var enemies;
 var speed = 5;
 var bg_sprite = new Image();
-var player_sprite = new Image();
+var main_sprite = new Image();
 
 init();
 
@@ -123,7 +123,7 @@ Enemy.prototype.ai = function () {
 function spawn_enemy(n) {
     var y_position = 600/(n+1);
     for (var i = 0; i < n; i++){
-        enemies[i] = new Enemy(y_position*(i+1), Math.floor(Math.random()*100)+830);
+        enemies[enemies.length] = new Enemy(y_position*(i+1), Math.floor(Math.random()*100)+830);
     }
 }
 
@@ -140,10 +140,15 @@ function loop(){
         requestaframe(loop);
 }
 
+function enemy_loop() {
+    spawn_enemy(Math.floor(Math.random()*6)+1);
+    setTimeout(enemy_loop, 3000);
+}
+
 function start_loop() {
     is_playing = true;
     loop();
-    spawn_enemy(Math.floor(Math.random()*6)+1);
+    enemy_loop()
 }
 
 function stop_loop(){
