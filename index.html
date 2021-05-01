@@ -3,11 +3,14 @@
   <head>
     <title>Project Buhesho</title>
     <link rel="stylesheet" href="style.css">
-    <script type="text/javascript" src="game.js"></script>
   </head>
   <body>
+  <button onclick="start_loop()">Start</button>
+  <button onclick="stop_loop()">Stop</button>
     <div id="game_object">
       <canvas id="background_canvas"></canvas>
-      <canvas id="mian_canvas" onmousemove="mouse">This browser does not support this game</canvas>
+      <canvas id="main_canvas" onmousemove="mouse(event)">This browser does not support this game</canvas>
     </div>
+    <script type="text/javascript" src="game.js"></script>
+  </body>
 </html>
