@@ -1,7 +1,7 @@
 var version = '0.0.1';
 var is_playing = false;
 var player;
-var enemy;
+var enemies;
 var speed = 5;
 var bg_sprite = new Image();
 var player_sprite = new Image();
@@ -29,7 +29,7 @@ function init() {
 
     })();
     player = new Player();
-    enemy = new Enemy;
+    enemies = new Array();
 
     load_media();
 }
@@ -101,9 +101,9 @@ Player.prototype.check_keys = function (){
 
 }
 
-function Enemy() {
-    this.drawX = 830;
-    this.drawY = 300;
+function Enemy(y, x) {
+    this.drawX = x;
+    this.drawY = y;
     this.srcY = 176;
     this.srcX = 15;
     this.width = 19;
@@ -121,15 +121,20 @@ Enemy.prototype.ai = function () {
 }
 
 function spawn_enemy(n) {
+    var y_position = 600/(n+1);
     for (var i = 0; i < n; i++){
-
+        enemies[i] = new Enemy(y_position*(i+1), Math.floor(Math.random()*100)+830);
     }
 }
 
 function loop(){
     main_ctx.clearRect(0,0,800,600);
     player.draw();
-    enemy.draw();
+
+    for (var i = 0; i < enemies.length; i++){
+        enemies[i].draw();
+    }
+
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
     if (is_playing)
         requestaframe(loop);
@@ -138,6 +143,7 @@ function loop(){
 function start_loop() {
     is_playing = true;
     loop();
+    spawn_enemy(Math.floor(Math.random()*6)+1);
 }
 
 function stop_loop(){
