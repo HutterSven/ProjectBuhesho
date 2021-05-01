@@ -30,6 +30,7 @@ function init() {
     })();
     player = new Player();
     enemies = new Array();
+    bullets = new Array();
 
     load_media();
 }
@@ -118,6 +119,53 @@ Enemy.prototype.draw = function(){
 
 Enemy.prototype.ai = function () {
     this.drawX -= this.speed;
+
+    if (Math.floor(Math.random()*50) == 25 ) {
+        bullets[bullets.length] = new Bullet(this.drawX, this.drawY);
+    }
+}
+
+function Bullet(x, y) {
+    this.drawX = x;
+    this.drawY = y;
+    this.srcX = 208;
+    this.srcY = 119;
+    this.width = 11;
+    this.heigth = 3;
+    this.speed = 6;
+
+}
+Bullet.prototype.draw = function() {
+    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    this.drawX -= this.speed;
+
+    if (this.drawX <= player.drawX + player.width && this.drawX + this.heigth >= player.drawX) {
+        main_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        sleep(250);
+        main_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
+        sleep(1000);
+    }
+}
+
+//Quelle: https://www.sitepoint.com/delay-sleep-pause-wait/
+function sleep(milliseconds) {
+    const date = Date.now();
+    let currentDate = null;
+    do {
+        currentDate = Date.now();
+    } while (currentDate - date < milliseconds);
 }
 
 function spawn_enemy(n) {
@@ -134,6 +182,9 @@ function loop(){
     for (var i = 0; i < enemies.length; i++){
         enemies[i].draw();
     }
+    for (var i = 0; i < bullets.length; i++){
+        bullets[i].draw();
+    }
 
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
     if (is_playing)
@@ -142,7 +193,7 @@ function loop(){
 
 function enemy_loop() {
     spawn_enemy(Math.floor(Math.random()*6)+1);
-    setTimeout(enemy_loop, 3000);
+    setTimeout(enemy_loop, 5000);
 }
 
 function start_loop() {
