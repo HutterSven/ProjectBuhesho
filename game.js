@@ -13,6 +13,10 @@ function init() {
     background_ctx = background_canvas.getContext('2d');
     main_canvas = document.getElementById('main_canvas');
     main_ctx = main_canvas.getContext('2d');
+    player_canvas = document.getElementById('player_canvas');
+    player_ctx = player_canvas.getContext('2d');
+    enemy_canvas = document.getElementById('enemy_canvas');
+    enemy_ctx = enemy_canvas.getContext('2d');
 
     document.addEventListener("keydown", key_down, false);
     document.addEventListener("keyup", key_up, false);
@@ -31,6 +35,7 @@ function init() {
     player = new Player();
     enemies = new Array();
     bullets = new Array();
+    friendlyBullets = new Array();
 
     load_media();
 }
@@ -64,11 +69,17 @@ function Player() {
     this.is_upkey = false;
     this.is_leftkey = false;
     this.is_rightkey = false;
+    this.is_spacekey = false;
+    this.exploded = false;
 }
 
 Player.prototype.draw = function(){
     this.check_keys();
     main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+
+    if (this.exploded == true) {
+        stop_loop();
+    }
 }
 
 Player.prototype.check_keys = function (){
@@ -100,6 +111,10 @@ Player.prototype.check_keys = function (){
         }
     };
 
+    if(this.is_spacekey == true){
+        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2);
+    };
+
 }
 
 function Enemy(y, x) {
@@ -110,17 +125,67 @@ function Enemy(y, x) {
     this.width = 19;
     this.heigth = 16;
     this.speed = 1;
+    this.exploded = false;
+    this.firstIteration = true;
+    this.hitType = 0;
 }
 
 Enemy.prototype.draw = function(){
     this.ai();
-    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    if (this.exploded == false) {
+        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    }
+
+    if (this.drawX <= player.drawX + player.width && this.drawX >= player.drawX
+        && this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY) {
+        this.exploded = true;
+        this.hitType = 1;
+    }
+
+    if (this.exploded == true && this.firstIteration == true) {
+        enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
+        setInterval(Bullet.prototype.draw, 1000);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        this.firstIteration = false;
+
+        if (this.hitType == 1) {
+            stop_loop();
+        }
+    }
 }
 
 Enemy.prototype.ai = function () {
     this.drawX -= this.speed;
-
-    if (Math.floor(Math.random()*50) == 25 ) {
+    if (Math.floor(Math.random()*50) == 25 && this.exploded == false) {
         bullets[bullets.length] = new Bullet(this.drawX, this.drawY);
     }
 }
@@ -133,39 +198,96 @@ function Bullet(x, y) {
     this.width = 11;
     this.heigth = 3;
     this.speed = 6;
+    this.exploded = false;
+    this.firstIteration = true;
 
 }
 Bullet.prototype.draw = function() {
-    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    if (this.exploded == false) {
+        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    }
     this.drawX -= this.speed;
 
-    if (this.drawX <= player.drawX + player.width && this.drawX + this.heigth >= player.drawX) {
-        main_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        sleep(250);
+    if (this.drawX <= player.drawX + player.width && this.drawX >= player.drawX
+        && this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY) {
+        this.exploded = true;
+    }
+
+    if (this.exploded == true && this.firstIteration == true) {
+     enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
         main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        sleep(250);
-        main_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
-        sleep(1000);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Bullet.prototype.draw, 250);
+        enemy_ctx.clearRect(0,0,800,600);
+
+        enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
+        setInterval(Bullet.prototype.draw, 1000);
+        enemy_ctx.clearRect(0,0,800,600);
+        this.firstIteration = false;
+
+        player.exploded = true;
     }
 }
 
+function FriendlyBullet(x, y) {
+    this.drawX = x;
+    this.drawY = y;
+    this.srcX = 208;
+    this.srcY = 119;
+    this.width = 11;
+    this.heigth = 3;
+    this.speed = 6;
+    this.exploded = false;
+    this.firstIteration = true;
+
+}
+FriendlyBullet.prototype.draw = function() {
+    if (this.exploded == false) {
+        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    }
+    this.drawX += this.speed;
+
+    for (var i = 0; i < enemies.length; i++) {
+        if (this.drawX <= enemies[i].drawX + enemies[i].width && this.drawX >= enemies[i].drawX
+            && this.drawY <= enemies[i].drawY + enemies[i].heigth && this.drawY >= enemies[i].drawY) {
+            this.exploded = true;
+        }
+
+        if (this.exploded == true && this.firstIteration == true) {
+            enemies[i].exploded = true;
+            this.firstIteration = false;
+        }
+    }
+
+
+}
+
+
 //Quelle: https://www.sitepoint.com/delay-sleep-pause-wait/
-function sleep(milliseconds) {
-    const date = Date.now();
-    let currentDate = null;
-    do {
-        currentDate = Date.now();
-    } while (currentDate - date < milliseconds);
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 function spawn_enemy(n) {
@@ -184,6 +306,10 @@ function loop(){
     }
     for (var i = 0; i < bullets.length; i++){
         bullets[i].draw();
+    }
+
+    for (var i = 0; i < friendlyBullets.length; i++){
+        friendlyBullets[i].draw();
     }
 
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
@@ -224,6 +350,10 @@ function key_down(e) {
         player.is_rightkey = true;
         e.preventDefault();
     }
+    if (key_id == 32){ // space bar
+        player.is_spacekey = true;
+        e.preventDefault();
+    }
 }
 
 function key_up(e) {
@@ -242,6 +372,10 @@ function key_up(e) {
     }
     if (key_id == 39){ // right key
         player.is_rightkey = false;
+        e.preventDefault();
+    }
+    if (key_id == 32){ // space bar
+        player.is_spacekey = false;
         e.preventDefault();
     }
 }
