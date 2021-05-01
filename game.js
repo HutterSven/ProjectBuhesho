@@ -3,6 +3,7 @@ var is_playing = false;
 var player;
 var speed = 5;
 var bg_sprite = new Image();
+var player_sprite = new Image();
 
 init();
 
@@ -33,6 +34,8 @@ function init() {
 function load_media() {
     bg_sprite = new Image();
     bg_sprite.src = 'images/bg_sprite.jpg';
+    player_sprite = new Image();
+    player_sprite.src = 'images/ship_sprite.png';
 }
 
 function mouse(e) {
@@ -48,7 +51,7 @@ function Player() {
     this.drawY = 300;
     this.bg_X = -400;
     this.bg_Y = -400;
-    this.speed = 10;
+    this.speed = 6;
     this.is_downkey = false;
     this.is_upkey = false;
     this.is_leftkey = false;
@@ -57,8 +60,7 @@ function Player() {
 
 Player.prototype.draw = function(){
     this.check_keys();
-    main_ctx.fillStyle = 'red';
-    main_ctx.fillRect(this.drawX,this.drawY,20,10,);
+    main_ctx.drawImage(player_sprite, this.drawX, this.drawY);
 }
 
 Player.prototype.check_keys = function (){
