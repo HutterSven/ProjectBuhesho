@@ -75,10 +75,44 @@ function Player() {
 
 Player.prototype.draw = function(){
     this.check_keys();
+    if (this.exploded == true) stop_loop();
+
     main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
 
     if (this.exploded == true) {
-        stop_loop();
+
+        player_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
+        setInterval(Player.prototype.draw, 250);
+        player_ctx.clearRect(0,0,800,600);
+
+        player_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
+        setInterval(Bullet.prototype.draw, 1000);
+        player_ctx.clearRect(0,0,800,600);
+
     }
 }
 
@@ -138,42 +172,45 @@ Enemy.prototype.draw = function(){
 
     if (this.drawX <= player.drawX + player.width && this.drawX >= player.drawX
         && this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY) {
+        this.drawY = 1000;
         this.exploded = true;
         this.hitType = 1;
     }
 
     if (this.exploded == true && this.firstIteration == true) {
+
+
         enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 250),
 
-        main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20), 250);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 500);
 
-        enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27), 500);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 750);
 
-        enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29), 750);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1000);
 
-        enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30), 1000);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1250);
 
-        enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1250);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600),1500);
 
-        enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1500);
+        setInterval(Enemy.prototype.draw, 250);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1750);
 
-        enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
-        setInterval(Bullet.prototype.draw, 1000);
-        enemy_ctx.clearRect(0,0,800,600);
+        setTimeout(enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31), 1750);
+        setInterval(Enemy.prototype.draw, 1000);
+        setTimeout(enemy_ctx.clearRect(0,0,800,600), 2000);
 
         this.firstIteration = false;
 
@@ -214,37 +251,7 @@ Bullet.prototype.draw = function() {
     }
 
     if (this.exploded == true && this.firstIteration == true) {
-     enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
 
-        main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Bullet.prototype.draw, 250);
-        enemy_ctx.clearRect(0,0,800,600);
-
-        enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
-        setInterval(Bullet.prototype.draw, 1000);
-        enemy_ctx.clearRect(0,0,800,600);
         this.firstIteration = false;
 
         player.exploded = true;
