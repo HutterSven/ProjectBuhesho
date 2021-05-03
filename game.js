@@ -110,7 +110,7 @@ Player.prototype.draw = function(){
         player_ctx.clearRect(0,0,800,600);
 
         player_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
-        setInterval(Bullet.prototype.draw, 1000);
+        setInterval(Player.prototype.draw, 1000);
         player_ctx.clearRect(0,0,800,600);
 
     }
@@ -168,11 +168,18 @@ Enemy.prototype.draw = function(){
     this.ai();
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+
+    }
+
+    if (this.exploded == true && this.firstIteration == false) {
+        this.drawY = -3000;
+        this.drawX = -3000;
+        this.heigth = 0;
+        this.width = 0;
     }
 
     if (this.drawX <= player.drawX + player.width && this.drawX >= player.drawX
         && this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY) {
-        this.drawY = 1000;
         this.exploded = true;
         this.hitType = 1;
     }
@@ -181,35 +188,27 @@ Enemy.prototype.draw = function(){
 
 
         enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 250),
 
         setTimeout(main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20), 250);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 500);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27), 500);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 750);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29), 750);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 1000);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30), 1000);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 1250);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1250);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600),1500);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1500);
-        setInterval(Enemy.prototype.draw, 250);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 1750);
 
         setTimeout(enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31), 1750);
-        setInterval(Enemy.prototype.draw, 1000);
         setTimeout(enemy_ctx.clearRect(0,0,800,600), 2000);
 
         this.firstIteration = false;
@@ -319,6 +318,7 @@ function loop(){
         friendlyBullets[i].draw();
     }
 
+    //Source: https://www.geeksforgeeks.org/html5-game-development-infinitely-scrolling-background/
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
     background_ctx.drawImage(bg_sprite, player.bg_X+800, player.bg_Y);
 
