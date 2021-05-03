@@ -36,6 +36,7 @@ function init() {
     enemies = new Array();
     bullets = new Array();
     friendlyBullets = new Array();
+    x =
 
     load_media();
 }
@@ -75,45 +76,63 @@ function Player() {
 
 Player.prototype.draw = function(){
     this.check_keys();
-    if (this.exploded == true) stop_loop();
-
-    main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
+    player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
 
     if (this.exploded == true) {
-
-        player_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32);
-        setInterval(Player.prototype.draw, 250);
-        player_ctx.clearRect(0,0,800,600);
-
-        player_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31);
-        setInterval(Player.prototype.draw, 1000);
-        player_ctx.clearRect(0,0,800,600);
-
+        stop_loop();
+        player_ctx.clearRect(0,0,800, 600);
     }
+
+    if (this.exploded == true) {
+        explode1(this.drawX, this.drawY);
+    }
+}
+
+function explode1(x, y) {
+    enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15, 13);
+    setTimeout(function(){explode2(x,y)}, 100);
+}
+
+function explode2(x, y) {
+    enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, 21, 20);
+    setTimeout(function(){explode3(x, y)}, 200);
+}
+
+function explode3(x, y) {
+    enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26, 27);
+    setTimeout(function(){explode4(x, y)}, 300);
+}
+
+function explode4(x, y) {
+    enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28, 29);
+    setTimeout(function(){explode5(x, y)}, 400);
+}
+
+function explode5(x, y) {
+    setTimeout(clearExplosion, 400);
+    enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31, 30);
+    setTimeout(function(){explode6(x, y)}, 500);
+}
+
+function explode6(x, y) {
+    setTimeout(clearExplosion, 500);
+    enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32, 32)
+    setTimeout(function(){explode7(x, y)}, 600);
+}
+
+function explode7(x, y) {
+    setTimeout(clearExplosion, 600);
+    enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32, 32);
+    setTimeout(function(){explode8(x, y)}, 700);
+}
+
+function explode8(x, y) {
+    setTimeout(clearExplosion, 700);
+    enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31, 31);
+}
+
+function clearExplosion() {
+    enemy_ctx.clearRect(0,0,800,600);
 }
 
 Player.prototype.check_keys = function (){
@@ -185,36 +204,12 @@ Enemy.prototype.draw = function(){
     }
 
     if (this.exploded == true && this.firstIteration == true) {
-
-
-        enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, this.drawX-10, this.drawY, 15, 13);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 250),
-
-        setTimeout(main_ctx.drawImage(main_sprite, 37, 134, 21, 20, this.drawX-10, this.drawY, 21, 20), 250);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 500);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, this.drawX-10, this.drawY, 26, 27), 500);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 750);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, this.drawX-10, this.drawY, 28, 29), 750);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1000);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, this.drawX-10, this.drawY, 31, 30), 1000);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1250);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1250);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600),1500);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, this.drawX-10, this.drawY, 32, 32), 1500);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 1750);
-
-        setTimeout(enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, this.drawX-10, this.drawY, 31, 31), 1750);
-        setTimeout(enemy_ctx.clearRect(0,0,800,600), 2000);
+        explode1(this.drawX, this.drawY);
 
         this.firstIteration = false;
 
         if (this.hitType == 1) {
-            stop_loop();
+            player.exploded = true;
         }
     }
 }
@@ -260,9 +255,9 @@ Bullet.prototype.draw = function() {
 function FriendlyBullet(x, y) {
     this.drawX = x;
     this.drawY = y;
-    this.srcX = 208;
-    this.srcY = 119;
-    this.width = 11;
+    this.srcX = 179;
+    this.srcY = 87;
+    this.width = 10;
     this.heigth = 3;
     this.speed = 6;
     this.exploded = false;
@@ -290,12 +285,6 @@ FriendlyBullet.prototype.draw = function() {
 
 }
 
-
-//Quelle: https://www.sitepoint.com/delay-sleep-pause-wait/
-function sleep(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 function spawn_enemy(n) {
     var y_position = 600/(n+1);
     for (var i = 0; i < n; i++){
@@ -305,6 +294,7 @@ function spawn_enemy(n) {
 
 function loop(){
     main_ctx.clearRect(0,0,800,600);
+    player_ctx.clearRect(0,0,800,600);
     player.draw();
 
     for (var i = 0; i < enemies.length; i++){
@@ -322,7 +312,7 @@ function loop(){
     background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
     background_ctx.drawImage(bg_sprite, player.bg_X+800, player.bg_Y);
 
-    player.bg_X -= 8;
+    player.bg_X -= 3;
 
     if (player.bg_X < -800) player.bg_X = 0;
 
