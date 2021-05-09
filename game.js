@@ -36,7 +36,6 @@ function init() {
     enemies = new Array();
     bullets = new Array();
     friendlyBullets = new Array();
-    x =
 
     load_media();
 }
@@ -72,6 +71,7 @@ function Player() {
     this.is_rightkey = false;
     this.is_spacekey = false;
     this.exploded = false;
+    this.powerUp = 1;
 }
 
 Player.prototype.draw = function(){
@@ -165,7 +165,11 @@ Player.prototype.check_keys = function (){
     };
 
     if(this.is_spacekey == true){
-        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2);
+        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, 0);
+        if (this.powerUp > 0) {
+            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, 3);
+            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, -3);
+        }
     };
 
 }
@@ -252,7 +256,7 @@ Bullet.prototype.draw = function() {
     }
 }
 
-function FriendlyBullet(x, y) {
+function FriendlyBullet(x, y, speedY) {
     this.drawX = x;
     this.drawY = y;
     this.srcX = 179;
@@ -262,13 +266,17 @@ function FriendlyBullet(x, y) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
+    this.speedY = speedY
 
 }
 FriendlyBullet.prototype.draw = function() {
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
     }
+    if (this.drawY >= 600 || this.drawY <= 0) {this.speedY = this.speedY*-1;};
+
     this.drawX += this.speed;
+    this.drawY += this.speedY;
 
     for (var i = 0; i < enemies.length; i++) {
         if (this.drawX <= enemies[i].drawX + enemies[i].width && this.drawX >= enemies[i].drawX
