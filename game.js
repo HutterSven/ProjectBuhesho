@@ -17,6 +17,9 @@ var main_sprite = new Image();
 var music;
 var explosionSound;
 var laserSound;
+var spacePos;
+var city1Pos;
+var city2Pos;
 
 init();
 
@@ -404,8 +407,15 @@ function spawn_enemy(n) {
 }
 
 function loop(){
+
+    speedCity1 = 4;
+    speedCity2 = 5;
+    speedSpace = 3;
+
     main_ctx.clearRect(0,0,800,600);
     player_ctx.clearRect(0,0,800,600);
+
+
     player.draw();
     powerUp.draw();
 
@@ -425,18 +435,24 @@ function loop(){
     }
 
     //Source: https://www.geeksforgeeks.org/html5-game-development-infinitely-scrolling-background/
-    background_ctx.drawImage(space_sprite, player.bg_X, player.bg_Y);
-    background_ctx.drawImage(space_sprite, player.bg_X+1000, player.bg_Y);
+    background_ctx.drawImage(space_sprite, spacePos, 0);
+    background_ctx.drawImage(space_sprite, spacePos+1000, 0);
 
-    background_ctx.drawImage(space_sprite, player.bg_X+2, player.bg_Y);
-    background_ctx.drawImage(space_sprite, player.bg_X+2002, player.bg_Y);
+    city_layer1_ctx.clearRect(0,0, 800,4000);
+    city_layer1_ctx.drawImage(city_sprite1, city1Pos, -100);
+    city_layer1_ctx.drawImage(city_sprite1, city1Pos+2000, -100);
 
-    background_ctx.drawImage(space_sprite, player.bg_X+1, player.bg_Y);
-    background_ctx.drawImage(space_sprite, player.bg_X+2001, player.bg_Y);
+    city_layer2_ctx.clearRect(0,0, 800,4000);
+    city_layer2_ctx.drawImage(city_sprite2, city2Pos, -100);
+    city_layer2_ctx.drawImage(city_sprite2, city2Pos+2000, -100);
 
-    player.bg_X -= 3;
+    spacePos -= speedSpace;
+    city1Pos -= speedCity1;
+    city2Pos -= speedCity2;
 
-    if (player.bg_X < -800) player.bg_X = 0;
+    if (spacePos < -1000) spacePos = 0;
+    if (city1Pos < -2000) city1Pos = 0;
+    if (city2Pos < -2000) city2Pos = 0;
 
     if (is_playing)
         requestaframe(loop);
@@ -459,6 +475,9 @@ function powerUp_loop() {
 }
 
 function start_loop() {
+    spacePos = 0;
+    city1Pos = 0;
+    city2Pos = 0;
     is_playing = true;
     setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
     loop();
