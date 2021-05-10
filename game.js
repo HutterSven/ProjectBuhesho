@@ -1,3 +1,7 @@
+//Quelle: Musik: https://freemusicarchive.org/genre/Chiptune?sort=date&d=0&pageSize=20&page=2 : sawsquarenoise / Boss Theme
+//Quelle: Lasersound: https://www.zapsplat.com/sound-effect-category/lasers-and-weapons/ : Science fiction laser hit, impact with a thud 1
+//Quelle: Explosion: https://www.zapsplat.com/sound-effect-category/lasers-and-weapons/ : Science fiction, large explosion 3
+
 var version = '0.0.1';
 var is_playing = false;
 var in_level = false;
@@ -6,7 +10,9 @@ var player;
 var enemies;
 var powerUp;
 var speed = 5;
-var bg_sprite = new Image();
+var space_sprite = new Image();
+var city_sprite1 = new Image();
+var city_sprite2 = new Image();
 var main_sprite = new Image();
 var music;
 var explosionSound;
@@ -15,7 +21,7 @@ var laserSound;
 init();
 
 function init() {
-    background_canvas = document.getElementById('background_canvas');
+    background_canvas = document.getElementById('space_canvas');
     background_ctx = background_canvas.getContext('2d');
     main_canvas = document.getElementById('main_canvas');
     main_ctx = main_canvas.getContext('2d');
@@ -23,6 +29,10 @@ function init() {
     player_ctx = player_canvas.getContext('2d');
     enemy_canvas = document.getElementById('enemy_canvas');
     enemy_ctx = enemy_canvas.getContext('2d');
+    city_canvas_layer1 = document.getElementById('city_canvas_layer1');
+    city_layer1_ctx =  city_canvas_layer1.getContext('2d');
+    city_canvas_layer2 = document.getElementById('city_canvas_layer2');
+    city_layer2_ctx =  city_canvas_layer2.getContext('2d');
 
     document.addEventListener("keydown", key_down, false);
     document.addEventListener("keyup", key_up, false);
@@ -48,10 +58,16 @@ function init() {
 }
 
 function load_media() {
-    bg_sprite = new Image();
-    bg_sprite.src = 'images/bg_sprite.jpg';
+    space_sprite = new Image();
+    space_sprite.src = 'images/Background_Sprite_1.png';
+    city_sprite1 = new Image();
+    city_sprite1.src = 'images/Background_Sprite_2.png'
+    city_sprite2 = new Image();
+    city_sprite2.src = 'images/Background_Sprite_3.png'
     main_sprite = new Image();
     main_sprite.src = 'images/main_sprite.png';
+
+
     music = new Audio("sounds/theme.mp3");
     explosionSound = new Audio("sounds/explosion.mp3");
     laserSound = new Audio("sounds/laser.mp3");
@@ -152,28 +168,28 @@ Player.prototype.check_keys = function (){
     if(this.is_downkey == true && this.drawY <= 550){
         this.drawY+=this.speed;
         if (this.bg_Y < 0) {
-            this.bg_Y += speed/2;
+           // this.bg_Y += speed/2;
         }
     };
 
     if(this.is_upkey == true && this.drawY >= 20){
         this.drawY-=this.speed;
         if (this.bg_Y > -1820) {
-            this.bg_Y -= speed/2;
+           // this.bg_Y -= speed/2;
         }
     };
 
     if(this.is_rightkey == true && this.drawX <= 750){
         this.drawX+=this.speed;
         if (this.bg_X < 0) {
-            this.bg_X += speed/2;
+           // this.bg_X += speed/2;
         }
     };
 
     if(this.is_leftkey == true && this.drawX >= 20){
         this.drawX-=this.speed;
         if (this.bg_X > -1214) {
-            this.bg_X -= speed/2;
+           // this.bg_X -= speed/2;
         }
     };
 
@@ -409,8 +425,14 @@ function loop(){
     }
 
     //Source: https://www.geeksforgeeks.org/html5-game-development-infinitely-scrolling-background/
-    background_ctx.drawImage(bg_sprite, player.bg_X, player.bg_Y);
-    background_ctx.drawImage(bg_sprite, player.bg_X+800, player.bg_Y);
+    background_ctx.drawImage(space_sprite, player.bg_X, player.bg_Y);
+    background_ctx.drawImage(space_sprite, player.bg_X+1000, player.bg_Y);
+
+    background_ctx.drawImage(space_sprite, player.bg_X+2, player.bg_Y);
+    background_ctx.drawImage(space_sprite, player.bg_X+2002, player.bg_Y);
+
+    background_ctx.drawImage(space_sprite, player.bg_X+1, player.bg_Y);
+    background_ctx.drawImage(space_sprite, player.bg_X+2001, player.bg_Y);
 
     player.bg_X -= 3;
 
