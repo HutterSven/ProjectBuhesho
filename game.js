@@ -82,6 +82,8 @@ function Player() {
     this.is_spacekey = false;
     this.exploded = false;
     this.powerUp = 0;
+    this.shootspeed = 0.3;
+    this.shootactive = false;
 }
 
 Player.prototype.draw = function(){
@@ -176,13 +178,34 @@ Player.prototype.check_keys = function (){
     };
 
     if(this.is_spacekey == true){
-        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, 0);
-        if (this.powerUp > 0) {
-            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, 3);
-            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(this.drawX+this.width, this.drawY+this.heigth/2, -3);
+        if(this.shootactive == false){
+            shoot();
         }
     };
 
+}
+
+function shoot() {
+    player.shootactive = true;
+    if (player.is_spacekey != false){
+        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, 0);
+        if(player.powerUp == 1){
+            player.shootspeed = 0.15;
+        }
+        if(player.powerUp == 2){
+            player.shootspeed = 0.075;
+        }
+        if (player.powerUp == 3) {
+            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, 3);
+            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, -3);
+        }
+        if(player.powerUp == 4){
+            player.shootspeed = 0.005;
+        }
+        setTimeout(shoot, player.shootspeed*1000);
+    }else{
+        player.shootactive = false;
+    }
 }
 
 function Enemy(y, x) {
