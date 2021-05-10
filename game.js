@@ -1,6 +1,7 @@
 //Quelle: Musik: https://freemusicarchive.org/genre/Chiptune?sort=date&d=0&pageSize=20&page=2 : sawsquarenoise / Boss Theme
 //Quelle: Lasersound: https://www.zapsplat.com/sound-effect-category/lasers-and-weapons/ : Science fiction laser hit, impact with a thud 1
 //Quelle: Explosion: https://www.zapsplat.com/sound-effect-category/lasers-and-weapons/ : Science fiction, large explosion 3
+//Quelle: City Layers: City vector created by freepik - www.freepik.com
 
 var version = '0.0.1';
 var is_playing = false;
@@ -17,6 +18,7 @@ var main_sprite = new Image();
 var music;
 var explosionSound;
 var laserSound;
+var itemSound;
 var spacePos;
 var city1Pos;
 var city2Pos;
@@ -75,6 +77,7 @@ function load_media() {
     music = new Audio("sounds/theme.mp3");
     explosionSound = new Audio("sounds/explosion.mp3");
     laserSound = new Audio("sounds/laser.mp3");
+    itemSound = new Audio("sounds/itemCollected.mp3");
 }
 
 function mouse(e) {
@@ -205,7 +208,7 @@ Player.prototype.check_keys = function (){
             player.shootspeed = 0.075;
         }
         if(player.powerUp == 4){
-            player.shootspeed = 0.005;
+            player.shootspeed = 0.075;
         }
         if(this.shootactive == false){
             shoot();
@@ -306,7 +309,8 @@ PowerUp.prototype.draw = function(){
 
     if (this.gotted == true && this.firstIteration == true) {
         player.powerUp++;
-
+        itemSound.volume = 1;
+        itemSound.play();
         this.drawY = -3000;
         this.drawX = -3000;
         this.heigth = 0;
@@ -422,7 +426,7 @@ function loop(){
     player.draw();
     powerUp.draw();
 
-    if (music.paused) {
+    if (music.paused && is_playing) {
         music.volume = 0.4;
         music.play();
     }
