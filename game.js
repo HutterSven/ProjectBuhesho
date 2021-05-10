@@ -8,6 +8,9 @@ var powerUp;
 var speed = 5;
 var bg_sprite = new Image();
 var main_sprite = new Image();
+var music;
+var explosionSound;
+var laserSound;
 
 init();
 
@@ -49,6 +52,9 @@ function load_media() {
     bg_sprite.src = 'images/bg_sprite.jpg';
     main_sprite = new Image();
     main_sprite.src = 'images/main_sprite.png';
+    music = new Audio("sounds/theme.mp3");
+    explosionSound = new Audio("sounds/explosion.mp3");
+    laserSound = new Audio("sounds/laser.mp3");
 }
 
 function mouse(e) {
@@ -94,6 +100,7 @@ Player.prototype.draw = function(){
 
 function explode1(x, y) {
     enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15, 13);
+    playExplosion();
     setTimeout(function(){explode2(x,y)}, 100);
 }
 
@@ -212,6 +219,7 @@ Enemy.prototype.draw = function(){
     }
 
     if (this.exploded == true && this.firstIteration == true) {
+
         explode1(this.drawX, this.drawY);
 
         this.firstIteration = false;
@@ -272,6 +280,7 @@ function Bullet(x, y) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
+    playLaser();
 
 }
 Bullet.prototype.draw = function() {
@@ -293,6 +302,19 @@ Bullet.prototype.draw = function() {
     }
 }
 
+//Quelle: https://stackoverflow.com/questions/6893080/html5-audio-play-sound-repeatedly-on-click-regardless-if-previous-iteration-h
+function playLaser() {
+    var laserShot = laserSound.cloneNode();
+    laserShot.volume=0.3;
+    laserShot.play();
+}
+
+function playExplosion() {
+    var explosion = explosionSound.cloneNode();
+    explosion.volume=1;
+    explosion.play();
+}
+
 function FriendlyBullet(x, y, speedY) {
     this.drawX = x;
     this.drawY = y;
@@ -303,7 +325,9 @@ function FriendlyBullet(x, y, speedY) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
-    this.speedY = speedY
+    this.speedY = speedY;
+
+    playLaser();
 
 }
 FriendlyBullet.prototype.draw = function() {
@@ -319,6 +343,7 @@ FriendlyBullet.prototype.draw = function() {
         if ((this.drawX <= enemies[i].drawX + enemies[i].width && this.drawX >= enemies[i].drawX || this.drawX+this.width*2 <= enemies[i].drawX + enemies[i].width && this.drawX+this.width*2 >= enemies[i].drawX)
             && (this.drawY <= enemies[i].drawY + enemies[i].heigth && this.drawY >= enemies[i].drawY || this.drawY+this.heigth*2 <= enemies[i].drawY + enemies[i].heigth && this.drawY+this.heigth*2 >= enemies[i].drawY)) {
             this.exploded = true;
+            playExplosion();
         }
 
         if (this.exploded == true && this.firstIteration == true) {
@@ -384,6 +409,7 @@ function powerUp_loop() {
 
 function start_loop() {
     is_playing = true;
+    music.play();
     setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
     loop();
     enemy_loop();
@@ -391,6 +417,7 @@ function start_loop() {
 }
 
 function stop_loop(){
+    music.pause();
     is_playing = false;
 }
 
