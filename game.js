@@ -349,13 +349,13 @@ Bullet.prototype.draw = function() {
 //Quelle: https://stackoverflow.com/questions/6893080/html5-audio-play-sound-repeatedly-on-click-regardless-if-previous-iteration-h
 function playLaser() {
     var laserShot = laserSound.cloneNode();
-    laserShot.volume=0.3;
+    laserShot.volume=0.1;
     laserShot.play();
 }
 
 function playExplosion() {
     var explosion = explosionSound.cloneNode();
-    explosion.volume=1;
+    explosion.volume=0.2;
     explosion.play();
 }
 
@@ -420,6 +420,7 @@ function loop(){
     powerUp.draw();
 
     if (music.paused) {
+        music.volume = 0.4;
         music.play();
     }
 
