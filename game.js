@@ -178,6 +178,15 @@ Player.prototype.check_keys = function (){
     };
 
     if(this.is_spacekey == true){
+        if(player.powerUp == 1){
+            player.shootspeed = 0.15;
+        }
+        if(player.powerUp == 2){
+            player.shootspeed = 0.075;
+        }
+        if(player.powerUp == 4){
+            player.shootspeed = 0.005;
+        }
         if(this.shootactive == false){
             shoot();
         }
@@ -189,18 +198,9 @@ function shoot() {
     player.shootactive = true;
     if (player.is_spacekey != false){
         friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, 0);
-        if(player.powerUp == 1){
-            player.shootspeed = 0.15;
-        }
-        if(player.powerUp == 2){
-            player.shootspeed = 0.075;
-        }
-        if (player.powerUp == 3) {
+        if (player.powerUp >= 3) {
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, 3);
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth/2, -3);
-        }
-        if(player.powerUp == 4){
-            player.shootspeed = 0.005;
         }
         setTimeout(shoot, player.shootspeed*1000);
     }else{
@@ -235,8 +235,8 @@ Enemy.prototype.draw = function(){
         this.width = 0;
     }
 
-    if ((this.drawX <= player.drawX + player.width && this.drawX >= player.drawX || this.drawX+this.width*2 <= player.drawX + player.width && this.drawX+this.width*2 >= player.drawX)
-        && (this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY || this.drawY+this.heigth*2 <= player.drawY + player.heigth && this.drawY+this.heigth*2 >= player.drawY)) {
+    if ((this.drawX <= player.drawX + player.width && this.drawX >= player.drawX || this.drawX+this.width <= player.drawX + player.width && this.drawX+this.width >= player.drawX)
+        && (this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY || this.drawY+this.heigth <= player.drawY + player.heigth && this.drawY+this.heigth >= player.drawY)) {
         this.exploded = true;
         this.hitType = 1;
     }
@@ -314,8 +314,8 @@ Bullet.prototype.draw = function() {
     }
     this.drawX -= this.speed;
 
-    if ((this.drawX <= player.drawX + player.width && this.drawX >= player.drawX || this.drawX+this.width*2 <= player.drawX + player.width && this.drawX+this.width*2 >= player.drawX)
-        && (this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY || this.drawY+this.heigth*2 <= player.drawY + player.heigth && this.drawY+this.heigth*2 >= player.drawY)) {
+    if ((this.drawX <= player.drawX + player.width && this.drawX >= player.drawX || this.drawX+this.width <= player.drawX + player.width && this.drawX+this.width >= player.drawX)
+        && (this.drawY <= player.drawY + player.heigth && this.drawY >= player.drawY || this.drawY+this.heigth <= player.drawY + player.heigth && this.drawY+this.heigth >= player.drawY)) {
         this.exploded = true;
     }
 
@@ -365,8 +365,8 @@ FriendlyBullet.prototype.draw = function() {
     this.drawY += this.speedY;
 
     for (var i = 0; i < enemies.length; i++) {
-        if ((this.drawX <= enemies[i].drawX + enemies[i].width && this.drawX >= enemies[i].drawX || this.drawX+this.width*2 <= enemies[i].drawX + enemies[i].width && this.drawX+this.width*2 >= enemies[i].drawX)
-            && (this.drawY <= enemies[i].drawY + enemies[i].heigth && this.drawY >= enemies[i].drawY || this.drawY+this.heigth*2 <= enemies[i].drawY + enemies[i].heigth && this.drawY+this.heigth*2 >= enemies[i].drawY)) {
+        if ((this.drawX <= enemies[i].drawX + enemies[i].width && this.drawX >= enemies[i].drawX || this.drawX+this.width <= enemies[i].drawX + enemies[i].width && this.drawX+this.width >= enemies[i].drawX)
+            && (this.drawY <= enemies[i].drawY + enemies[i].heigth && this.drawY >= enemies[i].drawY || this.drawY+this.heigth <= enemies[i].drawY + enemies[i].heigth && this.drawY+this.heigth >= enemies[i].drawY)) {
             this.exploded = true;
             playExplosion();
         }
