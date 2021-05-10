@@ -20,6 +20,7 @@ var laserSound;
 var spacePos;
 var city1Pos;
 var city2Pos;
+var deaded_dudes = 0;
 
 init();
 
@@ -261,7 +262,7 @@ Enemy.prototype.draw = function(){
     }
 
     if (this.exploded == true && this.firstIteration == true) {
-
+        deaded_dudes++;
         explode1(this.drawX, this.drawY);
 
         this.firstIteration = false;
@@ -411,6 +412,8 @@ function loop(){
     speedCity1 = 4;
     speedCity2 = 5;
     speedSpace = 3;
+
+    document.getElementById("enemies").innerHTML = deaded_dudes;
 
     main_ctx.clearRect(0,0,800,600);
     player_ctx.clearRect(0,0,800,600);
