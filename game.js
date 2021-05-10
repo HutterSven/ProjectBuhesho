@@ -90,14 +90,14 @@ Player.prototype.draw = function(){
     this.check_keys();
     player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width, this.heigth);
 
-    if (this.exploded == true) {
-        stop_loop();
-        player_ctx.clearRect(0,0,800, 600);
-    }
+    //if (this.exploded == true) {
+      //  stop_loop();
+        //player_ctx.clearRect(0,0,800, 600);
+    //}
 
-    if (this.exploded == true) {
-        explode1(this.drawX, this.drawY);
-    }
+    //if (this.exploded == true) {
+    //    explode1(this.drawX, this.drawY);
+    //}
 }
 
 function explode1(x, y) {
@@ -269,6 +269,7 @@ function PowerUp(y, x) {
     this.heigth = 10;
     this.speed = 2;
     this.gotted = false;
+    this.firstIteration = true;
 }
 
 PowerUp.prototype.draw = function(){
@@ -283,13 +284,14 @@ PowerUp.prototype.draw = function(){
         this.gotted = true;
     }
 
-    if (this.gotted == true) {
+    if (this.gotted == true && this.firstIteration == true) {
         player.powerUp++;
 
         this.drawY = -3000;
         this.drawX = -3000;
         this.heigth = 0;
         this.width = 0;
+        this.firstIteration = false;
     }
 }
 
@@ -391,6 +393,10 @@ function loop(){
     player.draw();
     powerUp.draw();
 
+    if (music.paused) {
+        music.play();
+    }
+
     for (var i = 0; i < enemies.length; i++){
         enemies[i].draw();
     }
@@ -432,7 +438,6 @@ function powerUp_loop() {
 
 function start_loop() {
     is_playing = true;
-    music.play();
     setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
     loop();
     enemy_loop();
