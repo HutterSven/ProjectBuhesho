@@ -5,7 +5,7 @@
 
 var version = '0.0.1';
 var is_playing = false;
-var in_level = false;
+var in_level = true;
 var level = 0;
 var player;
 var enemies;
@@ -22,6 +22,10 @@ var itemSound;
 var spacePos;
 var city1Pos;
 var city2Pos;
+var speedSpace;
+var speedCity1;
+var speedCity2;
+var startTime;
 var deaded_dudes = 0;
 var size_scale = 2;
 
@@ -266,7 +270,7 @@ Enemy.prototype.draw = function(){
     }
 
     if (this.exploded == true && this.firstIteration == true) {
-        deaded_dudes++;
+
         explode1(this.drawX, this.drawY);
 
         this.firstIteration = false;
@@ -393,6 +397,7 @@ FriendlyBullet.prototype.draw = function() {
         if ((this.drawX <= enemies[i].drawX + enemies[i].width*size_scale && this.drawX >= enemies[i].drawX || this.drawX+this.width*size_scale <= enemies[i].drawX + enemies[i].width*size_scale && this.drawX+this.width*size_scale >= enemies[i].drawX)
             && (this.drawY <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY >= enemies[i].drawY || this.drawY+this.heigth*size_scale <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY+this.heigth*size_scale >= enemies[i].drawY)) {
             this.exploded = true;
+            deaded_dudes++;
             playExplosion();
         }
 
@@ -414,15 +419,37 @@ function spawn_enemy(n) {
 
 function loop(){
 
-    speedCity1 = 4;
-    speedCity2 = 5;
-    speedSpace = 3;
-
-    document.getElementById("enemies").innerHTML = deaded_dudes;
-
     main_ctx.clearRect(0,0,800,600);
     player_ctx.clearRect(0,0,800,600);
 
+    if (new Date() / 1000 - startTime >= 30) {
+        level++;
+        in_level = false;
+        speedCity1 *= 4;
+        speedCity2 *= 4;
+        speedSpace *= 4;
+        startTime = new Date() / 1000;
+
+        for (var i = 0; i < enemies.length; i++) {
+            enemies[i].exploded = true;
+        }
+
+        for (var i = 0; i < bullets.length; i++) {
+            bullets[i].exploded = true;
+        }
+
+    }
+
+    if (new Date() / 1000 - startTime >= 3 && !in_level) {
+        speedCity1 = 4;
+        speedCity2 = 5;
+        speedSpace = 3;
+    }
+
+
+    if (new Date() / 1000 - startTime >= 5 && !in_level) {
+        betweenLevels();
+    }
 
     player.draw();
     powerUp.draw();
@@ -467,10 +494,18 @@ function loop(){
         requestaframe(loop);
 }
 
+function betweenLevels() {
+    in_level = true;
+    startTime = new Date() / 1000;
+    enemy_loop();
+    powerUp_loop();
+}
+
 function enemy_loop() {
-    spawn_enemy(Math.floor(Math.random()*6)+1);
-    if(is_playing) // change to enemy variable
+    if(in_level) {
+        spawn_enemy(Math.floor(Math.random() * 6) + 1);
         setTimeout(enemy_loop, 5000);
+    }
 }
 
 function spawn_powerUp() {
@@ -478,15 +513,20 @@ function spawn_powerUp() {
 }
 
 function powerUp_loop() {
-    spawn_powerUp();
-    if(is_playing)
-        setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
+    if(in_level) {
+        spawn_powerUp();
+        setTimeout(powerUp_loop, Math.floor(Math.random() * 20000) + 20000);
+    }
 }
 
 function start_loop() {
+    speedCity1 = 4;
+    speedCity2 = 5;
+    speedSpace = 3;
     spacePos = 0;
     city1Pos = 0;
     city2Pos = 0;
+    startTime = new Date() / 1000;
     is_playing = true;
     setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
     loop();
