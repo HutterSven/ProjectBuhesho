@@ -6,7 +6,7 @@
 var version = '0.0.1';
 var is_playing = false;
 var in_level = true;
-var level = 0;
+var level = 1;
 var player;
 var enemies;
 var powerUp;
@@ -28,6 +28,9 @@ var speedCity2;
 var startTime;
 var deaded_dudes = 0;
 var size_scale = 2;
+var font;
+var bullets;
+var friendlyBullets;
 
 init();
 
@@ -44,6 +47,9 @@ function init() {
     city_layer1_ctx =  city_canvas_layer1.getContext('2d');
     city_canvas_layer2 = document.getElementById('city_canvas_layer2');
     city_layer2_ctx =  city_canvas_layer2.getContext('2d');
+    levelText_canvas = document.getElementById('levelText_canvas');
+    levelText_ctx = levelText_canvas.getContext('2d');
+
 
     document.addEventListener("keydown", key_down, false);
     document.addEventListener("keyup", key_up, false);
@@ -64,6 +70,7 @@ function init() {
     enemies = new Array();
     bullets = new Array();
     friendlyBullets = new Array();
+    powerUp = new Array();
 
     load_media();
 }
@@ -77,6 +84,9 @@ function load_media() {
     city_sprite2.src = 'images/Background_Sprite_3.png'
     main_sprite = new Image();
     main_sprite.src = 'images/main_sprite.png';
+    font = "bold 100px Audiowide";
+    levelText_ctx.fillStyle = "white";
+    levelText_ctx.font = font;
 
 
     music = new Audio("sounds/theme.mp3");
@@ -205,7 +215,7 @@ Player.prototype.check_keys = function (){
         }
     };
 
-    if(this.is_spacekey == true){
+    if(this.is_spacekey == true && in_level){
         if(player.powerUp == 1){
             player.shootspeed = 0.15;
         }
@@ -441,22 +451,33 @@ function loop(){
     }
 
     if (new Date() / 1000 - startTime >= 3 && !in_level) {
+        powerUp = [];
+        bullets = [];
+        friendlyBullets = [];
+        enemies = [];
+        levelText_ctx.clearRect(0,0, 800, 600);
         speedCity1 = 4;
         speedCity2 = 5;
         speedSpace = 3;
+        levelText_ctx.fillText("Level "+level, 200, 300);
     }
 
 
     if (new Date() / 1000 - startTime >= 5 && !in_level) {
+        levelText_ctx.clearRect(0,0, 800, 600);
         betweenLevels();
     }
 
     player.draw();
-    powerUp.draw();
+
 
     if (music.paused && is_playing) {
         music.volume = 1;
         music.play();
+    }
+
+    for (var i = 0; i < powerUp.length; i++){
+        powerUp[i].draw();
     }
 
     for (var i = 0; i < enemies.length; i++){
@@ -509,13 +530,13 @@ function enemy_loop() {
 }
 
 function spawn_powerUp() {
-    powerUp = new PowerUp(Math.floor(Math.random()*550)+25, 830);
+    powerUp[powerUp.length] = new PowerUp(Math.floor(Math.random()*550)+25, 830);
 }
 
 function powerUp_loop() {
     if(in_level) {
         spawn_powerUp();
-        setTimeout(powerUp_loop, Math.floor(Math.random() * 20000) + 20000);
+        setTimeout(powerUp_loop, Math.floor(Math.random() * 20000) + 5000);
     }
 }
 
@@ -528,7 +549,7 @@ function start_loop() {
     city2Pos = 0;
     startTime = new Date() / 1000;
     is_playing = true;
-    setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+20000);
+    setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+5000);
     loop();
     enemy_loop();
 
