@@ -5,10 +5,7 @@
     <link rel="stylesheet" href="style.css">
     <link href='https://fonts.googleapis.com/css?family=Audiowide' rel='stylesheet'>
   </head>
-  <body>
-  <button onclick="start_loop()">Start</button>
-  <button onclick="stop_loop()">Stop</button>
-  Enemies defeated:<span id="enemies"></span>
+  <body onload="start_loop()">
     <div id="game_object">
       <canvas id="space_canvas" width="800px" height="600px" style='position: absolute; top: 30px; left: 0px'></canvas>
       <canvas id="city_canvas_layer1"  width="800px" height="600px" style="top: 30px; left: 0px" onmousemove="mouse(event)"></canvas>
@@ -17,6 +14,7 @@
       <canvas id="player_canvas"  width="800px" height="600px" style="top: 30px; left: 0px" onmousemove="mouse(event)"></canvas>
       <canvas id="enemy_canvas"  width="800px" height="600px" style="top: 30px; left: 0px" onmousemove="mouse(event)"></canvas>
       <canvas id="levelText_canvas"  width="800px" height="600px" style="top: 30px; left: 0px" onmousemove="mouse(event)"></canvas>
+      <canvas id="highScore_canvas"  width="800px" height="600px" style="top: 30px; left: 0px" onmousemove="mouse(event)"></canvas>
     </div>
     <script type="text/javascript" src="game.js"></script>
   </body>
