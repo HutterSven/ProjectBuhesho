@@ -2,4 +2,11 @@ canvas {
   position: absolute;
   width: 800px;
   height: 600px;
+  top: 30px;
+  left: 0px;
 }
+
+.space_canvas{
+  position: absolute;
+}
+
