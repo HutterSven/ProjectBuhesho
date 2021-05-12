@@ -30,6 +30,7 @@ var size_scale = 2;
 var fontLevel;
 var fontScore;
 var fontButton;
+var fontTitle;
 var bullets;
 var friendlyBullets;
 var enemiesSpawning;
@@ -98,6 +99,7 @@ function load_media() {
     fontLevel = "bold 100px Audiowide";
     fontScore = "bold 30px Audiowide";
     fontButton = "bold 50px Audiowide";
+    fontTitle = "bold 80px Audiowide";
 
     levelText_ctx.fillStyle = "white";
     levelText_ctx.font = fontLevel;
@@ -510,13 +512,18 @@ function loop(){
         //Quelle: https://stackoverflow.com/questions/13771310/center-proportional-font-text-in-an-html5-canvas
         if (isDead) {
             var messageText = "Game Over";
-            textWidth = city_layer2_ctx.measureText(messageText).width;
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
         }
         else {
-            var messageText = "Press SPACE to play",
-            textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.font = fontTitle;
+            var messageText = "Project BuHeSho";
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
+            city_layer2_ctx.font = fontButton;
+            messageText = "Press SPACE to play";
+            textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 400);
         }
 
         spacePos -= 1;
