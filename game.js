@@ -36,6 +36,8 @@ var enemiesSpawning;
 var score;
 var isDead;
 var inSequence;
+var spawnEnemy;
+var spawnPowerup;
 
 init();
 
@@ -242,7 +244,9 @@ function gameOverTimeOut() {
     friendlyBullets = new Array();
     powerUp = new Array();
     in_level = true;
-    startTime = new Date() / 1000;
+    startTime = Math.floor(new Date() / 1000);
+    spawnEnemy = Math.floor(new Date() / 1000);
+    spawnPowerup = Math.floor(new Date() / 1000);
 
     level = 1;
     score = 0;
@@ -255,13 +259,12 @@ function gameOverTimeOut() {
     player.shootactive = false;
 
     is_playing = true;
+    inSequence = false;
     isDead = false;
     player.exploded = false;
 
     explodeAll();
 
-    setTimeout(powerUp_loop, Math.floor(Math.random()*20000)+5000);
-    enemy_loop();
 }
 
 function shoot() {
@@ -286,11 +289,13 @@ function Enemy(y, x, type) {
     this.width = 19;
     this.heigth = 16;
     this.type = type;
+    this.hits = 1;
     if (this.type == 2) {
         this.srcY = 170;
         this.srcX = 153;
         this.width = 30;
         this.heigth = 32;
+        this.hits = 3;
     }
     this.speed = 1;
     this.exploded = false;
@@ -302,7 +307,6 @@ Enemy.prototype.draw = function(){
     this.ai();
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
-
     }
 
     if (this.exploded && this.firstIteration == false) {
@@ -453,8 +457,8 @@ FriendlyBullet.prototype.draw = function() {
         }
 
         if (this.exploded && this.firstIteration) {
-            enemies[i].type--;
-            if (enemies[i].type < 1) enemies[i].exploded = true;
+            enemies[i].hits--;
+            if (enemies[i].hits < 1) enemies[i].exploded = true;
             this.firstIteration = false;
         }
     }
@@ -463,7 +467,7 @@ FriendlyBullet.prototype.draw = function() {
 }
 
 function spawn_enemy(n) {
-    if (!isDead) {
+    if (true) {
         var y_position = 600 / (n + 1);
         type = 1;
 
@@ -519,7 +523,7 @@ function loop(){
             speedCity1 *= 4;
             speedCity2 *= 4;
             speedSpace *= 4;
-            startTime = new Date() / 1000;
+            startTime = Math.floor(new Date() / 1000);
 
             explodeAll();
 
@@ -545,8 +549,18 @@ function loop(){
 
         player.draw();
 
+        if (Math.floor(new Date()/1000 - spawnEnemy) == 3 && !inSequence) {
+            spawnEnemy = Math.floor(new Date() / 1000);
+            spawn_enemy(Math.floor(Math.random() * enemiesSpawning) + 1);
+        }
 
-        if (music.paused && is_playing) {
+        if (Math.floor(new Date()/1000 - spawnPowerup) == 20 && !inSequence) {
+            spawnPowerup = Math.floor(new Date() / 1000);
+            spawn_powerUp();
+        }
+
+
+        if (music.paused) {
             music.volume = 1;
             music.play();
         }
@@ -622,29 +636,15 @@ function initializeContexts() {
 function betweenLevels() {
     in_level = true;
     inSequence = false;
-    startTime = new Date() / 1000;
-    enemy_loop();
-    powerUp_loop();
+    spawnPowerup = Math.floor(new Date() / 1000);
+    spawnEnemy = Math.floor(new Date() / 1000);
+    startTime = Math.floor(new Date() / 1000);
 }
 
 //todo fix enemy and power up spawning after game over
 
-function enemy_loop() {
-    if(in_level && is_playing && !isDead) {
-        spawn_enemy(Math.floor(Math.random() * enemiesSpawning) + 1);
-        setTimeout(enemy_loop, 5000);
-    }
-}
-
 function spawn_powerUp() {
     if (!isDead) powerUp[powerUp.length] = new PowerUp(Math.floor(Math.random()*550)+25, 830);
-}
-
-function powerUp_loop() {
-    if(in_level && is_playing && !isDead) {
-        spawn_powerUp();
-        setTimeout(powerUp_loop, Math.floor(Math.random() * 20000) + 5000);
-    }
 }
 
 function start_loop() {
@@ -654,14 +654,9 @@ function start_loop() {
     spacePos = 0;
     city1Pos = 0;
     city2Pos = 0;
-    startTime = new Date() / 1000;
+    startTime = Math.floor(new Date() / 1000);
     is_playing = false;
     loop();
-}
-
-function stop_loop(){
-    music.pause();
-    is_playing = false;
 }
 
 function key_down(e) {
