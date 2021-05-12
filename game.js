@@ -514,6 +514,13 @@ function loop(){
             var messageText = "Game Over";
             var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
+            city_layer2_ctx.font = fontScore;
+            var messageText = "Your Score is: ";
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 325);
+            var messageText = score;
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 375);
         }
         else {
             city_layer2_ctx.font = fontTitle;
