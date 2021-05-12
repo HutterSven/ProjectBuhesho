@@ -129,6 +129,7 @@ function Player() {
     this.powerUp = 0;
     this.shootspeed = 0.3;
     this.shootactive = false;
+    this.gameOverTimer = 0;
 }
 
 Player.prototype.draw = function(){
@@ -144,6 +145,7 @@ Player.prototype.draw = function(){
 
         explodeAll();
 
+        this.gameOverTimer = new Date() / 1000;
         player_ctx.clearRect(0,0,800,600);
         highScore_ctx.clearRect(0,0,800,600);
         main_ctx.clearRect(0,0,800,600);
@@ -154,45 +156,49 @@ Player.prototype.draw = function(){
 function explode1(x, y) {
     enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15*size_scale, 13*size_scale);
     playExplosion();
-    setTimeout(function(){explode2(x,y)}, 100);
+    setTimeout(function(){explode2(x,y)}, 80);
 }
 
 function explode2(x, y) {
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, 21*size_scale, 20*size_scale);
-    setTimeout(function(){explode3(x, y)}, 200);
+    setTimeout(function(){explode3(x, y)}, 80);
 }
 
 function explode3(x, y) {
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26*size_scale, 27*size_scale);
-    setTimeout(function(){explode4(x, y)}, 300);
+    setTimeout(function(){explode4(x, y)}, 80);
 }
 
 function explode4(x, y) {
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28*size_scale, 29*size_scale);
-    setTimeout(function(){explode5(x, y)}, 400);
+    setTimeout(function(){explode5(x, y)}, 80);
 }
 
 function explode5(x, y) {
-    setTimeout(clearExplosion, 400);
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31*size_scale, 30*size_scale);
-    setTimeout(function(){explode6(x, y)}, 500);
+    setTimeout(function(){explode6(x, y)}, 80);
 }
 
 function explode6(x, y) {
-    setTimeout(clearExplosion, 500);
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32*size_scale, 32*size_scale)
-    setTimeout(function(){explode7(x, y)}, 600);
+    setTimeout(function(){explode7(x, y)}, 80);
 }
 
 function explode7(x, y) {
-    setTimeout(clearExplosion, 600);
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32*size_scale, 32*size_scale);
-    setTimeout(function(){explode8(x, y)}, 700);
+    setTimeout(function(){explode8(x, y)}, 80);
 }
 
 function explode8(x, y) {
-    setTimeout(clearExplosion, 700);
+    clearExplosion();
     enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31*size_scale, 31*size_scale);
+    setTimeout(clearExplosion, 80);
 }
 
 function clearExplosion() {
@@ -233,38 +239,34 @@ Player.prototype.check_keys = function (){
     };
 
     if(this.is_spacekey && !in_level && !is_playing && !inSequence) {
-           gameOverTimeOut();
+        if (new Date() / 1000 - this.gameOverTimer > 1) {
+            enemies = new Array();
+            bullets = new Array();
+            friendlyBullets = new Array();
+            powerUp = new Array();
+            in_level = true;
+            startTime = Math.floor(new Date() / 1000);
+            spawnEnemy = Math.floor(new Date() / 1000);
+            spawnPowerup = Math.floor(new Date() / 1000);
+
+            level = 1;
+            score = 0;
+
+            player.drawX = 50;
+            player.drawY = 300;
+            player.exploded = false;
+            player.powerUp = 0;
+            player.shootspeed = 0.3;
+            player.shootactive = false;
+
+            is_playing = true;
+            inSequence = false;
+            isDead = false;
+            player.exploded = false;
+
+            explodeAll();
         }
-}
-
-function gameOverTimeOut() {
-
-    enemies = new Array();
-    bullets = new Array();
-    friendlyBullets = new Array();
-    powerUp = new Array();
-    in_level = true;
-    startTime = Math.floor(new Date() / 1000);
-    spawnEnemy = Math.floor(new Date() / 1000);
-    spawnPowerup = Math.floor(new Date() / 1000);
-
-    level = 1;
-    score = 0;
-
-    player.drawX = 50;
-    player.drawY = 300;
-    player.exploded = false;
-    player.powerUp = 0;
-    player.shootspeed = 0.3;
-    player.shootactive = false;
-
-    is_playing = true;
-    inSequence = false;
-    isDead = false;
-    player.exploded = false;
-
-    explodeAll();
-
+    }
 }
 
 function shoot() {
