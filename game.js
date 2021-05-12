@@ -511,6 +511,13 @@ function loop(){
 
         //Quelle: https://stackoverflow.com/questions/13771310/center-proportional-font-text-in-an-html5-canvas
         if (isDead) {
+            var highscore = score;
+            if (highscore > localStorage.getItem("highscore")){
+                localStorage.setItem("highscore", score);
+            }else{
+                highscore = localStorage.getItem("highscore")
+            }
+
             var messageText = "Game Over";
             var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
@@ -521,6 +528,12 @@ function loop(){
             var messageText = score;
             var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 375);
+            var messageText = "Your Highscore is: ";
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 425);
+            var messageText = highscore;
+            var textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 475);
         }
         else {
             city_layer2_ctx.font = fontTitle;
