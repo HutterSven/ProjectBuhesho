@@ -281,7 +281,7 @@ function shoot() {
     }
 }
 
-function Enemy(y, x, type) {
+function Enemy(y, x, type, moving) {
     this.drawX = x;
     this.drawY = y;
     this.srcY = 176;
@@ -289,7 +289,11 @@ function Enemy(y, x, type) {
     this.width = 19;
     this.heigth = 16;
     this.type = type;
+    this.moving = moving;
     this.hits = 1;
+    this.distanceY = this.drawY;
+    this.direction = 1;
+    this.shootTime = Math.floor(new Date() / 1000);
     if (this.type == 2) {
         this.srcY = 170;
         this.srcX = 153;
@@ -340,7 +344,20 @@ function checkHit(object1, object2) {
 
 Enemy.prototype.ai = function () {
     this.drawX -= this.speed;
-    if (Math.floor(Math.random()*50) == 25 && this.exploded == false) {
+    if (!this.moving) {
+        this.direction = 0;
+    }
+    else if (this.moving && this.distanceY - this.drawY >= 75) {
+        this.direction = 1;
+    }
+    else if (this.moving && this.distanceY - this.drawY <= -75) {
+        this.direction = -1;
+    }
+
+    this.drawY += (this.speed*2)*this.direction;
+
+    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/10)+1) && this.exploded == false) {
+        this.shootTime = Math.floor(new Date()/1000);
         bullets[bullets.length] = new Bullet(this.drawX-(this.width*size_scale/2), this.drawY+(this.heigth*size_scale/2));
     }
 }
@@ -451,22 +468,22 @@ FriendlyBullet.prototype.draw = function() {
     for (var i = 0; i < enemies.length; i++) {
         if (checkHit(this, enemies[i])) {
             this.exploded = true;
-            deaded_dudes++;
-            score += enemies[i].type*1000;
             playExplosion();
         }
 
         if (this.exploded && this.firstIteration) {
             enemies[i].hits--;
-            if (enemies[i].hits < 1) enemies[i].exploded = true;
+            if (enemies[i].hits < 1) {
+                enemies[i].exploded = true;
+                score += enemies[i].type*1000;
+                deaded_dudes++;
+            }
             this.firstIteration = false;
         }
     }
-
-
 }
 
-function spawn_enemy(n) {
+function spawn_enemy(n, moving) {
     if (true) {
         var y_position = 600 / (n + 1);
         type = 1;
@@ -474,7 +491,7 @@ function spawn_enemy(n) {
         if (level > 1) type = Math.floor(Math.random() * 2) + 1;
 
         for (var i = 0; i < n; i++) {
-            enemies[enemies.length] = new Enemy(y_position * (i + 1), Math.floor(Math.random() * 100) + 830, type);
+            enemies[enemies.length] = new Enemy(y_position * (i + 1), Math.floor(Math.random() * 100) + 830, type, moving);
         }
     }
 }
@@ -551,7 +568,7 @@ function loop(){
 
         if (Math.floor(new Date()/1000 - spawnEnemy) == 3 && !inSequence) {
             spawnEnemy = Math.floor(new Date() / 1000);
-            spawn_enemy(Math.floor(Math.random() * enemiesSpawning) + 1);
+            spawn_enemy(Math.floor(Math.random() * enemiesSpawning) + 1, Math.random() < 0.5);
         }
 
         if (Math.floor(new Date()/1000 - spawnPowerup) == 20 && !inSequence) {
@@ -640,8 +657,6 @@ function betweenLevels() {
     spawnEnemy = Math.floor(new Date() / 1000);
     startTime = Math.floor(new Date() / 1000);
 }
-
-//todo fix enemy and power up spawning after game over
 
 function spawn_powerUp() {
     if (!isDead) powerUp[powerUp.length] = new PowerUp(Math.floor(Math.random()*550)+25, 830);
