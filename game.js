@@ -511,6 +511,7 @@ function loop(){
 
         //Quelle: https://stackoverflow.com/questions/13771310/center-proportional-font-text-in-an-html5-canvas
         if (isDead) {
+            //Quelle: https://www.w3schools.com/html/html5_webstorage.asp
             var highscore = score;
             if (highscore > localStorage.getItem("highscore")){
                 localStorage.setItem("highscore", score);
