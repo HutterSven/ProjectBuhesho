@@ -254,6 +254,7 @@ Player.prototype.check_keys = function (){
             startTime = Math.floor(new Date() / 1000);
             spawnEnemy = Math.floor(new Date() / 1000);
             spawnPowerup = Math.floor(new Date() / 1000);
+            enemiesSpawning = 3;
 
             level = 1;
             score = 0;
@@ -261,7 +262,7 @@ Player.prototype.check_keys = function (){
             player.drawX = 50;
             player.drawY = 300;
             player.exploded = false;
-            player.powerUp = 0;
+            player.powerUp = 4  ;
             player.shootspeed = 0.3;
             player.shootactive = false;
 
@@ -562,10 +563,12 @@ function loop(){
         }
         else {
             city_layer2_ctx.font = fontTitle;
+            city_layer2_ctx.fillStyle = 'pink';
             var messageText = "Project BuHeSho";
             var textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
             city_layer2_ctx.font = fontButton;
+            city_layer2_ctx.fillStyle = 'white';
             messageText = "Press SPACE to play";
             textWidth = city_layer2_ctx.measureText(messageText).width;
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 400);
