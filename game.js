@@ -41,7 +41,8 @@ var inSequence;
 var spawnEnemy;
 var spawnPowerup;
 var missileTimer;
-
+var missileSizeScale = 4;
+var missileExplosionSize = 30;
 init();
 
 function init() {
@@ -473,8 +474,11 @@ function FriendlyBullet(x, y, speedY, missile) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
+    this.firstMissileIteration = true;
     this.speedY = speedY;
     this.missile = missile;
+    this.explosionWidth = missileSizeScale*missileExplosionSize;
+    this.explosionHeigth = missileSizeScale*missileExplosionSize;
 
     if (this.missile) {
         this.srcX = 178;
@@ -503,6 +507,22 @@ FriendlyBullet.prototype.draw = function() {
         if (new Date() - this.waitMissile >= 250 || !this.missile) this.drawX += this.speed;
         this.drawY += this.speedY;
     }
+
+    if(this.missile && this.drawX > 500 && this.firstMissileIteration){
+        explode1(this.drawX, this.drawY-(this.explosionHeigth/2), missileSizeScale);
+        this.firstMissileIteration = false;
+        this.exploded = true;
+        for (var i = 0; i < enemies.length; i++) {
+            if (((this.drawX <= enemies[i].drawX + enemies[i]*size_scale && this.drawX >= enemies[i].drawX || this.drawX+this.explosionWidth <= enemies[i].drawX + enemies[i].width*size_scale && this.drawX+this.explosionWidth >= enemies[i].drawX)
+                && (this.drawY <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY >= enemies[i].drawY || this.drawY+this.explosionHeigth <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY+this.explosionHeigth >= enemies[i].drawY))){
+                enemies[i].hits = 0;
+                enemies[i].exploded = true;
+                score += enemies[i].type*1000;
+                deaded_dudes++;
+            }
+        }
+    }
+
     for (var i = 0; i < enemies.length; i++) {
         if (checkHit(this, enemies[i])) {
             if (!this.missile) this.exploded = true;
