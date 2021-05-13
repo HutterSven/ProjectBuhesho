@@ -18,6 +18,7 @@ var music;
 var explosionSound;
 var laserSound;
 var itemSound;
+var rocketSound;
 var spacePos;
 var city1Pos;
 var city2Pos;
@@ -38,6 +39,7 @@ var isDead;
 var inSequence;
 var spawnEnemy;
 var spawnPowerup;
+var missileTimer;
 
 init();
 
@@ -74,14 +76,15 @@ function init() {
 
     })();
     player = new Player();
-    enemies = new Array();
-    bullets = new Array();
-    friendlyBullets = new Array();
-    powerUp = new Array();
+    enemies = [];
+    bullets = [];
+    friendlyBullets = [];
+    powerUp = [];
     enemiesSpawning = 3;
     score = 0;
     isDead = false;
     inSequence = false;
+    missileTimer = 0;
 
     load_media();
 }
@@ -109,6 +112,7 @@ function load_media() {
     explosionSound = new Audio("sounds/explosion.mp3");
     laserSound = new Audio("sounds/laser.mp3");
     itemSound = new Audio("sounds/itemCollected.mp3");
+    rocketSound = new Audio("sounds/rocket.mp3");
 
 }
 
@@ -240,10 +244,10 @@ Player.prototype.check_keys = function (){
 
     if(this.is_spacekey && !in_level && !is_playing && !inSequence) {
         if (new Date() / 1000 - this.gameOverTimer > 1) {
-            enemies = new Array();
-            bullets = new Array();
-            friendlyBullets = new Array();
-            powerUp = new Array();
+            enemies = [];
+            bullets = [];
+            friendlyBullets = [];
+            powerUp = [];
             in_level = true;
             startTime = Math.floor(new Date() / 1000);
             spawnEnemy = Math.floor(new Date() / 1000);
@@ -272,10 +276,14 @@ Player.prototype.check_keys = function (){
 function shoot() {
     player.shootactive = true;
     if (player.is_spacekey != false){
-        friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0);
+        if (!(player.powerUp >= 4 && (new Date() - missileTimer >= 500 || missileTimer == 0))) friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0);
         if (player.powerUp >= 3) {
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 3);
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, -3);
+        }
+        if (player.powerUp >= 4 && (new Date() - missileTimer >= 500 || missileTimer == 0)) {
+            friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0, true);
+            missileTimer = new Date();
         }
         setTimeout(shoot, player.shootspeed*1000);
     }else{
@@ -437,13 +445,19 @@ function playLaser() {
     laserShot.play();
 }
 
+function playRocket() {
+    var rocket = rocketSound.cloneNode();
+    rocket.volume=0.2;
+    rocket.play();
+}
+
 function playExplosion() {
     var explosion = explosionSound.cloneNode();
     explosion.volume=0.025;
     explosion.play();
 }
 
-function FriendlyBullet(x, y, speedY) {
+function FriendlyBullet(x, y, speedY, missile) {
     this.drawX = x;
     this.drawY = y;
     this.srcX = 179;
@@ -454,8 +468,17 @@ function FriendlyBullet(x, y, speedY) {
     this.exploded = false;
     this.firstIteration = true;
     this.speedY = speedY;
+    this.missile = missile;
 
-    playLaser();
+    if (this.missile) {
+        this.srcX = 178;
+        this.srcY = 4;
+        this.width = 13;
+        this.heigth = 6;
+    }
+
+    if (!this.missile) playLaser();
+    else playRocket();
 
 }
 FriendlyBullet.prototype.draw = function() {
@@ -469,12 +492,13 @@ FriendlyBullet.prototype.draw = function() {
 
     for (var i = 0; i < enemies.length; i++) {
         if (checkHit(this, enemies[i])) {
-            this.exploded = true;
+            if (!this.missile) this.exploded = true;
             playExplosion();
         }
 
         if (this.exploded && this.firstIteration) {
             enemies[i].hits--;
+            if (this.missile) enemies[i].hits = 0;
             if (enemies[i].hits < 1) {
                 enemies[i].exploded = true;
                 score += enemies[i].type*1000;
