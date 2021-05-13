@@ -169,43 +169,43 @@ function explode1(x, y, scale) {
 }
 
 function explode2(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, 21*size_scale*scale, 20*size_scale*scale);
     setTimeout(function(){explode3(x, y, scale)}, 80);
 }
 
 function explode3(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26*size_scale*scale, 27*size_scale*scale);
     setTimeout(function(){explode4(x, y, scale)}, 80);
 }
 
 function explode4(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28*size_scale*scale, 29*size_scale*scale);
     setTimeout(function(){explode5(x, y, scale)}, 80);
 }
 
 function explode5(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31*size_scale*scale, 30*size_scale*scale);
     setTimeout(function(){explode6(x, y, scale)}, 80);
 }
 
 function explode6(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale)
     setTimeout(function(){explode7(x, y,scale)}, 80);
 }
 
 function explode7(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale);
     setTimeout(function(){explode8(x, y, scale)}, 80);
 }
 
 function explode8(x, y, scale) {
-    clearExplosion();
+    //clearExplosion();
     enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31*size_scale*scale, 31*size_scale*scale);
     setTimeout(clearExplosion, 80);
 }
@@ -508,42 +508,40 @@ FriendlyBullet.prototype.draw = function() {
         this.drawY += this.speedY;
     }
 
-    if(this.missile && this.drawX > 500 && this.firstMissileIteration){
-        explode1(this.drawX, this.drawY-(this.explosionHeigth/2), missileSizeScale);
-        this.firstMissileIteration = false;
-        this.exploded = true;
-        for (var i = 0; i < enemies.length; i++) {
-            if (((this.drawX <= enemies[i].drawX + enemies[i]*size_scale && this.drawX >= enemies[i].drawX || this.drawX+this.explosionWidth <= enemies[i].drawX + enemies[i].width*size_scale && this.drawX+this.explosionWidth >= enemies[i].drawX)
-                && (this.drawY <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY >= enemies[i].drawY || this.drawY+this.explosionHeigth <= enemies[i].drawY + enemies[i].heigth*size_scale && this.drawY+this.explosionHeigth >= enemies[i].drawY))){
-                enemies[i].hits = 0;
-                enemies[i].exploded = true;
-                score += enemies[i].type*1000;
-                deaded_dudes++;
+    for (var i = 0; i < enemies.length; i++) {
+        if (this.missile && (checkHit(this, enemies[i]) || this.drawX >= 500)) {
+            this.width = this.explosionWidth;
+            this.heigth = this.explosionHeigth;
+            this.exploded = true;
+            if (this.firstIteration) {
+                explode1(this.drawX-this.explosionHeigth/2, this.drawY, missileSizeScale);
+                playExplosion();
             }
         }
-    }
-
-    for (var i = 0; i < enemies.length; i++) {
         if (checkHit(this, enemies[i])) {
             if (!this.missile) this.exploded = true;
-            playExplosion();
         }
 
-        if (this.exploded && this.firstIteration) {
+        if (this.exploded && (this.firstIteration || this.missile)) {
             enemies[i].hits--;
-            if (this.missile) enemies[i].hits = 0;
+            if (this.missile && checkHit(this, enemies[i])) enemies[i].hits = 0;
             if (enemies[i].hits < 1) {
-                enemies[i].exploded = true;
+                if (checkHit(this, enemies[i])) enemies[i].exploded = true;
                 score += enemies[i].type*1000;
                 deaded_dudes++;
             }
             this.firstIteration = false;
         }
     }
+    if (this.exploded) {
+        this.drawY = 1337;
+        this.drawX = -1337;
+        this.speed = 0;
+        this.missile = false;
+    }
 }
 
 function spawn_enemy(n, moving) {
-    if (true) {
         var y_position = 600 / (n + 1);
         type = 1;
 
@@ -552,7 +550,6 @@ function spawn_enemy(n, moving) {
         for (var i = 0; i < n; i++) {
             enemies[enemies.length] = new Enemy(y_position * (i + 1), Math.floor(Math.random() * 100) + 830, type, moving);
         }
-    }
 }
 
 function loop(){
