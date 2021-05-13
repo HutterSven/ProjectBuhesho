@@ -262,7 +262,7 @@ Player.prototype.check_keys = function (){
             player.drawX = 50;
             player.drawY = 300;
             player.exploded = false;
-            player.powerUp = 4  ;
+            player.powerUp = 0;
             player.shootspeed = 0.3;
             player.shootactive = false;
 
