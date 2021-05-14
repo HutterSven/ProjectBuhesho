@@ -460,7 +460,7 @@ function playRocket() {
 
 function playExplosion() {
     var explosion = explosionSound.cloneNode();
-    explosion.volume=0.025;
+    explosion.volume=0.25;
     explosion.play();
 }
 
@@ -477,8 +477,6 @@ function FriendlyBullet(x, y, speedY, missile) {
     this.firstMissileIteration = true;
     this.speedY = speedY;
     this.missile = missile;
-    this.explosionWidth = missileSizeScale*missileExplosionSize;
-    this.explosionHeigth = missileSizeScale*missileExplosionSize;
 
     if (this.missile) {
         this.srcX = 178;
@@ -486,6 +484,8 @@ function FriendlyBullet(x, y, speedY, missile) {
         this.width = 13;
         this.heigth = 6;
         this.playerPosition = player.drawY;
+        this.explosionWidth = missileSizeScale*missileExplosionSize;
+        this.explosionHeigth = missileSizeScale*missileExplosionSize;
     }
 
     if (!this.missile) playLaser();
@@ -510,11 +510,13 @@ FriendlyBullet.prototype.draw = function() {
 
     for (var i = 0; i < enemies.length; i++) {
         if (this.missile && (checkHit(this, enemies[i]) || this.drawX >= 500)) {
-            this.width = this.explosionWidth;
-            this.heigth = this.explosionHeigth;
-            this.exploded = true;
             if (this.firstIteration) {
-                explode1(this.drawX-this.explosionHeigth/2, this.drawY, missileSizeScale);
+                this.drawX = this.drawX-this.explosionWidth/2;
+                this.drawY = this.drawY-this.explosionHeigth/2;
+                this.width = this.explosionWidth;
+                this.heigth = this.explosionHeigth;
+                this.exploded = true;
+                explode1(this.drawX-this.explosionHeigth/2, this.drawY-this.explosionHeigth/2, missileSizeScale);
                 playExplosion();
             }
         }
@@ -532,6 +534,7 @@ FriendlyBullet.prototype.draw = function() {
             }
             this.firstIteration = false;
         }
+
     }
     if (this.exploded) {
         this.drawY = 1337;
