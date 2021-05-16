@@ -148,7 +148,7 @@ Player.prototype.draw = function(){
         is_playing = false;
         in_level = false;
         this.is_spacekey = false;
-        explode1(this.drawX, this.drawY);
+        explode1(this.drawX, this.drawY,1,false);
 
         explodeAll();
 
@@ -160,58 +160,71 @@ Player.prototype.draw = function(){
     }
 }
 
-function explode1(x, y, scale) {
-    this.scale = 1;
-    if (scale > 0) this.scale = scale;
+function explode1(x, y, scale, missileExplosion) {
+    this.scale = scale;
+    if (!missileExplosion) this.scale = 1;
     enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15*size_scale*this.scale, 13*size_scale*this.scale);
     playExplosion();
     setTimeout(function(){explode2(x,y, this.scale)}, 80);
 }
 
 function explode2(x, y, scale) {
-    //clearExplosion();
-    enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, 21*size_scale*scale, 20*size_scale*scale);
+    width = 21*size_scale*scale;
+    height = 20*size_scale*scale;
+    clearExplosion(x, y, width, height);
+    enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, width, height);
     setTimeout(function(){explode3(x, y, scale)}, 80);
 }
 
 function explode3(x, y, scale) {
-    //clearExplosion();
+    width = 26*size_scale*scale;
+    height = 27*size_scale*scale;
+    clearExplosion(x, y, width, height);
     enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26*size_scale*scale, 27*size_scale*scale);
     setTimeout(function(){explode4(x, y, scale)}, 80);
 }
 
 function explode4(x, y, scale) {
-    //clearExplosion();
+    width = 28*size_scale*scale;
+    height = 29*size_scale*scale;
+    clearExplosion(x, y, width, height);
     enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28*size_scale*scale, 29*size_scale*scale);
     setTimeout(function(){explode5(x, y, scale)}, 80);
 }
 
 function explode5(x, y, scale) {
-    //clearExplosion();
+    width = 31*size_scale*scale;
+    height = 30*size_scale*scale;
+    clearExplosion(x, y, width, height);
     enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31*size_scale*scale, 30*size_scale*scale);
     setTimeout(function(){explode6(x, y, scale)}, 80);
 }
 
 function explode6(x, y, scale) {
-    //clearExplosion();
+    width = 32*size_scale*scale;
+    height = 32*size_scale*scale;
+    clearExplosion(x, y, width, height);
     enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale)
     setTimeout(function(){explode7(x, y,scale)}, 80);
 }
 
 function explode7(x, y, scale) {
-    //clearExplosion();
+    width = 32*size_scale*scale;
+    height = 32*size_scale*scale;
+    clearExplosion(x, y, width, height);
     enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale);
     setTimeout(function(){explode8(x, y, scale)}, 80);
 }
 
 function explode8(x, y, scale) {
-    //clearExplosion();
+    width = 31*size_scale*scale;
+    height = 31*size_scale*scale;
     enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31*size_scale*scale, 31*size_scale*scale);
-    setTimeout(clearExplosion, 80);
+    clearExplosion(0, 0, 800, 600);
 }
 
-function clearExplosion() {
-    enemy_ctx.clearRect(0,0,800,600);
+function clearExplosion(x, y, width, height) {
+    enemy_ctx.clearRect(x,y,width,height);
 }
 
 Player.prototype.check_keys = function (){
@@ -344,7 +357,7 @@ Enemy.prototype.draw = function(){
 
     if (this.exploded && this.firstIteration) {
 
-        explode1(this.drawX, this.drawY);
+        explode1(this.drawX, this.drawY, 1, false);
 
         this.firstIteration = false;
 
@@ -516,7 +529,7 @@ FriendlyBullet.prototype.draw = function() {
                 this.width = this.explosionWidth;
                 this.heigth = this.explosionHeigth;
                 this.exploded = true;
-                explode1(this.drawX-this.explosionHeigth/2, this.drawY-this.explosionHeigth/2, missileSizeScale);
+                explode1(this.drawX-this.explosionHeigth/2, this.drawY-this.explosionHeigth/2, missileSizeScale, true);
                 playExplosion();
             }
         }
