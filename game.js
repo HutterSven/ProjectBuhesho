@@ -455,7 +455,7 @@ function Bullet(x, y) {
     playLaser();
 
 }
-Bullet.prototype.draw = function() {
+Laser.prototype.draw = function() {
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
     }
