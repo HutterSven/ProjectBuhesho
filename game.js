@@ -34,6 +34,7 @@ var fontButton;
 var fontTitle;
 var bullets;
 var friendlyBullets;
+var lasers;
 var enemiesSpawning;
 var score;
 var isDead;
@@ -82,6 +83,7 @@ function init() {
     bullets = [];
     friendlyBullets = [];
     powerUp = [];
+    lasers = [];
     enemiesSpawning = 3;
     score = 0;
     isDead = false;
@@ -257,6 +259,9 @@ Player.prototype.check_keys = function (){
         }
         if(this.shootactive == false){
             shoot();
+            if (player.powerUp == 5){
+                shootLaser();
+            }
         }
     };
 
@@ -279,7 +284,7 @@ Player.prototype.check_keys = function (){
             player.drawX = 50;
             player.drawY = 300;
             player.exploded = false;
-            player.powerUp = 4;
+            player.powerUp = 5;
             player.shootspeed = 0.3;
             player.shootactive = false;
 
@@ -305,6 +310,16 @@ function shoot() {
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0, true);
             missileTimer = new Date();
         }
+        setTimeout(shoot, player.shootspeed*1000);
+    }else{
+        player.shootactive = false;
+    }
+}
+
+function shootLaser() {
+    player.shootactive = true;
+    if (player.is_spacekey != false){
+        lasers[lasers.length] = new Laser(player.drawX+player.width);
         setTimeout(shoot, player.shootspeed*1000);
     }else{
         player.shootactive = false;
@@ -549,6 +564,51 @@ FriendlyBullet.prototype.draw = function() {
     }
 }
 
+function Laser(x){
+    this.drawX = x;
+    this.drawY = player.drawY + (player.heigth/2);
+    this.srcX = 73;
+    this.srcY = 392;
+    this.width = 16;
+    this.heigth = 7;
+    this.speed = 6;
+    this.exploded = false;
+    this.firstIteration = false;
+}
+
+FriendlyBullet.prototype.draw = function() {
+    if (this.exploded == false) {
+        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, player.drawY + (player.heigth/2), this.width*size_scale, this.heigth*size_scale);
+    }
+
+    if (this.drawY >= 600 || this.drawY <= 0) {this.speedY*=-1;};
+
+    for (var i = 0; i < enemies.length; i++) {
+        if (checkHit(this, enemies[i])) {
+            if (this.firstIteration) {
+                this.exploded = true;
+            }
+        }
+
+        if (this.exploded && (this.firstIteration)) {
+            enemies[i].hits--;
+            if (enemies[i].hits < 1) {
+                if (checkHit(this, enemies[i])) enemies[i].exploded = true;
+                score += enemies[i].type*1000;
+                deaded_dudes++;
+            }
+            this.firstIteration = false;
+        }
+
+    }
+    if (this.exploded) {
+        this.drawY = 1337;
+        this.drawX = -1337;
+        this.speed = 0;
+        this.missile = false;
+    }
+}
+
 function spawn_enemy(n, moving) {
         var y_position = 600 / (n + 1);
         type = 1;
@@ -687,6 +747,10 @@ function loop(){
 
         for (var i = 0; i < friendlyBullets.length; i++) {
             friendlyBullets[i].draw();
+        }
+
+        for (var i = 0; i < lasers.length; i++) {
+            lasers[i].draw();
         }
 
         //Source: https://www.geeksforgeeks.org/html5-game-development-infinitely-scrolling-background/
