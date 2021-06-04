@@ -455,7 +455,7 @@ function Bullet(x, y) {
     playLaser();
 
 }
-Laser.prototype.draw = function() {
+Bullet.prototype.draw = function() {
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
     }
@@ -576,7 +576,7 @@ function Laser(x){
     this.firstIteration = false;
 }
 
-FriendlyBullet.prototype.draw = function() {
+Laser.prototype.draw = function() {
     if (this.exploded == false) {
         main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, player.drawY + (player.heigth/2), this.width*size_scale, this.heigth*size_scale);
     }
