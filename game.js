@@ -144,7 +144,7 @@ Player.prototype.draw = function(){
     player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
 
     if (this.exploded) {
-        isDead = true;
+/*        isDead = true;
         is_playing = false;
         in_level = false;
         this.is_spacekey = false;
@@ -155,7 +155,7 @@ Player.prototype.draw = function(){
         this.gameOverTimer = new Date() / 1000;
         player_ctx.clearRect(0,0,800,600);
         highScore_ctx.clearRect(0,0,800,600);
-        main_ctx.clearRect(0,0,800,600);
+        main_ctx.clearRect(0,0,800,600);*/
 
     }
 }
@@ -522,26 +522,18 @@ FriendlyBullet.prototype.draw = function() {
     }
 
     for (var i = 0; i < enemies.length; i++) {
-        if (this.missile && (checkHitMissile(this, enemies[i]) || this.drawX >= 500)) {
-            if (this.firstIteration) {
-                this.drawX = this.drawX-this.explosionWidth/2;
-                this.drawY = this.drawY-this.explosionHeigth/2;
-                this.width = this.explosionWidth;
-                this.heigth = this.explosionHeigth;
-                this.exploded = true;
-                explode1(this.drawX-this.explosionHeigth/2, this.drawY-this.explosionHeigth/2, missileSizeScale, true);
-                playExplosion();
-            }
-        }
+
         if (checkHit(this, enemies[i])) {
-            if (!this.missile) this.exploded = true;
+                if (!this.missile) {
+                    this.exploded = true;
+                }
         }
 
-        if (this.exploded && (this.firstIteration || this.missile)) {
+        if ((this.exploded && this.firstIteration) || (this.missile && checkHit(this, enemies[i]))) {
             enemies[i].hits--;
-            if (this.missile && checkHitMissile(this, enemies[i])) enemies[i].hits = 0;
+            if (this.missile) enemies[i].hits = 0;
             if (enemies[i].hits < 1) {
-                if (checkHitMissile(this, enemies[i])) enemies[i].exploded = true;
+                enemies[i].exploded = true;
                 score += enemies[i].type*1000;
                 deaded_dudes++;
             }
@@ -555,15 +547,6 @@ FriendlyBullet.prototype.draw = function() {
         this.speed = 0;
         this.missile = false;
     }
-}
-
-function checkHitMissile(friendlyBullet, Enemy){
-    var distanceX = Math.abs((friendlyBullet.drawX+(friendlyBullet.explosionWidth/2))-Enemy.drawX);
-    var distanceY = Math.abs((friendlyBullet.drawY+(friendlyBullet.explosionHeigth/2))-Enemy.drawY);
-    var diagonalDistance = Math.sqrt(Math.pow(distanceX,2)+Math.pow(distanceY,2));
-    if (diagonalDistance < friendlyBullet.explosionWidth/2){return true}
-    return false;
-
 }
 
 function spawn_enemy(n, moving) {
