@@ -522,7 +522,7 @@ FriendlyBullet.prototype.draw = function() {
     }
 
     for (var i = 0; i < enemies.length; i++) {
-        if (this.missile && (checkHit(this, enemies[i]) || this.drawX >= 500)) {
+        if (this.missile && (checkHitMissile(this, enemies[i]) || this.drawX >= 500)) {
             if (this.firstIteration) {
                 this.drawX = this.drawX-this.explosionWidth/2;
                 this.drawY = this.drawY-this.explosionHeigth/2;
@@ -539,9 +539,9 @@ FriendlyBullet.prototype.draw = function() {
 
         if (this.exploded && (this.firstIteration || this.missile)) {
             enemies[i].hits--;
-            if (this.missile && checkHit(this, enemies[i])) enemies[i].hits = 0;
+            if (this.missile && checkHitMissile(this, enemies[i])) enemies[i].hits = 0;
             if (enemies[i].hits < 1) {
-                if (checkHit(this, enemies[i])) enemies[i].exploded = true;
+                if (checkHitMissile(this, enemies[i])) enemies[i].exploded = true;
                 score += enemies[i].type*1000;
                 deaded_dudes++;
             }
@@ -555,6 +555,15 @@ FriendlyBullet.prototype.draw = function() {
         this.speed = 0;
         this.missile = false;
     }
+}
+
+function checkHitMissile(friendlyBullet, Enemy){
+    var distanceX = Math.abs((friendlyBullet.drawX+(friendlyBullet.explosionWidth/2))-Enemy.drawX);
+    var distanceY = Math.abs((friendlyBullet.drawY+(friendlyBullet.explosionHeigth/2))-Enemy.drawY);
+    var diagonalDistance = Math.sqrt(Math.pow(distanceX,2)+Math.pow(distanceY,2));
+    if (diagonalDistance < friendlyBullet.explosionWidth/2){return true}
+    return false;
+
 }
 
 function spawn_enemy(n, moving) {
