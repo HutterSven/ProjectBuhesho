@@ -44,6 +44,7 @@ var spawnPowerup;
 var missileTimer;
 var missileSizeScale = 4;
 var missileExplosionSize = 30;
+var laser;
 init();
 
 function init() {
@@ -83,7 +84,6 @@ function init() {
     bullets = [];
     friendlyBullets = [];
     powerUp = [];
-    lasers = [];
     enemiesSpawning = 3;
     score = 0;
     isDead = false;
@@ -258,12 +258,12 @@ Player.prototype.check_keys = function (){
             player.shootspeed = 0.075;
         }
         if(this.shootactive == false){
-            shoot();
+            //shoot();
             if (player.powerUp == 5){
                 shootLaser();
             }
         }
-    };
+    }
 
     if(this.is_spacekey && !in_level && !is_playing && !inSequence) {
         if (new Date() / 1000 - this.gameOverTimer > 1) {
@@ -300,7 +300,7 @@ Player.prototype.check_keys = function (){
 
 function shoot() {
     player.shootactive = true;
-    if (player.is_spacekey != false){
+    if (player.is_spacekey){
         if (!(player.powerUp >= 4 && (new Date() - missileTimer >= 500 || missileTimer == 0))) friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0);
         if (player.powerUp >= 3) {
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 3);
@@ -318,9 +318,8 @@ function shoot() {
 
 function shootLaser() {
     player.shootactive = true;
-    if (player.is_spacekey != false){
-        lasers[lasers.length] = new Laser(player.drawX+player.width);
-        setTimeout(shoot, player.shootspeed*1000);
+    if (player.is_spacekey){
+        laser = new Laser(player.drawX+player.width);
     }else{
         player.shootactive = false;
     }
@@ -502,7 +501,6 @@ function FriendlyBullet(x, y, speedY, missile) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
-    this.firstMissileIteration = true;
     this.speedY = speedY;
     this.missile = missile;
 
@@ -512,8 +510,6 @@ function FriendlyBullet(x, y, speedY, missile) {
         this.width = 13;
         this.heigth = 6;
         this.playerPosition = player.drawY;
-        this.explosionWidth = missileSizeScale*missileExplosionSize;
-        this.explosionHeigth = missileSizeScale*missileExplosionSize;
     }
 
     if (!this.missile) playLaser();
@@ -565,47 +561,29 @@ FriendlyBullet.prototype.draw = function() {
 }
 
 function Laser(x){
-    this.drawX = x;
-    this.drawY = player.drawY + (player.heigth/2);
+    this.drawX = player.drawX + player.width;
+    this.drawY = player.drawY + player.heigth/2 + this.heigth;
     this.srcX = 73;
     this.srcY = 392;
     this.width = 16;
     this.heigth = 7;
-    this.speed = 6;
-    this.exploded = false;
-    this.firstIteration = false;
 }
 
 Laser.prototype.draw = function() {
-    if (this.exploded == false) {
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, player.drawY + (player.heigth/2), this.width*size_scale, this.heigth*size_scale);
+    if (player.is_spacekey) {
+        this.drawX = player.drawX + player.width;
+        this.drawY = player.drawY + player.heigth/2 + this.heigth -3 ;
+        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*150, this.heigth*size_scale*2);
     }
-
-    if (this.drawY >= 600 || this.drawY <= 0) {this.speedY*=-1;};
 
     for (var i = 0; i < enemies.length; i++) {
-        if (checkHit(this, enemies[i])) {
-            if (this.firstIteration) {
-                this.exploded = true;
-            }
+        if (enemies[i].drawY+enemies[i].heigth >= this.drawY && enemies[i].drawY <= this.drawY ||
+            enemies[i].drawY+enemies[i].heigth >= this.drawY+this.heigth*size_scale*2 && enemies[i].drawY <= this.drawY+this.heigth*size_scale*2){
+            enemies[i].hits = 0;
+            enemies[i].exploded = true;
+            score += enemies[i].type*1000;
+            deaded_dudes++;
         }
-
-        if (this.exploded && (this.firstIteration)) {
-            enemies[i].hits--;
-            if (enemies[i].hits < 1) {
-                if (checkHit(this, enemies[i])) enemies[i].exploded = true;
-                score += enemies[i].type*1000;
-                deaded_dudes++;
-            }
-            this.firstIteration = false;
-        }
-
-    }
-    if (this.exploded) {
-        this.drawY = 1337;
-        this.drawX = -1337;
-        this.speed = 0;
-        this.missile = false;
     }
 }
 
@@ -734,6 +712,8 @@ function loop(){
             music.play();
         }
 
+        laser.draw();
+
         for (var i = 0; i < powerUp.length; i++) {
             powerUp[i].draw();
         }
@@ -747,10 +727,6 @@ function loop(){
 
         for (var i = 0; i < friendlyBullets.length; i++) {
             friendlyBullets[i].draw();
-        }
-
-        for (var i = 0; i < lasers.length; i++) {
-            lasers[i].draw();
         }
 
         //Source: https://www.geeksforgeeks.org/html5-game-development-infinitely-scrolling-background/
