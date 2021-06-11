@@ -16,7 +16,7 @@ var city_sprite2 = new Image();
 var main_sprite = new Image();
 var music;
 var explosionSound;
-var laserSound;
+var bulletSound;
 var itemSound;
 var rocketSound;
 var spacePos;
@@ -34,7 +34,6 @@ var fontButton;
 var fontTitle;
 var bullets;
 var friendlyBullets;
-var lasers;
 var enemiesSpawning;
 var score;
 var isDead;
@@ -42,9 +41,8 @@ var inSequence;
 var spawnEnemy;
 var spawnPowerup;
 var missileTimer;
-var missileSizeScale = 4;
-var missileExplosionSize = 30;
 var laser;
+
 init();
 
 function init() {
@@ -115,7 +113,7 @@ function load_media() {
 
     music = new Audio("sounds/theme.mp3");
     explosionSound = new Audio("sounds/explosion.mp3");
-    laserSound = new Audio("sounds/laser.mp3");
+    bulletSound = new Audio("sounds/laser.mp3");
     itemSound = new Audio("sounds/itemCollected.mp3");
     rocketSound = new Audio("sounds/rocket.mp3");
 
@@ -258,10 +256,7 @@ Player.prototype.check_keys = function (){
             player.shootspeed = 0.075;
         }
         if(this.shootactive == false){
-            //shoot();
-            if (player.powerUp == 5){
-                shootLaser();
-            }
+            shoot();
         }
     }
 
@@ -284,7 +279,7 @@ Player.prototype.check_keys = function (){
             player.drawX = 50;
             player.drawY = 300;
             player.exploded = false;
-            player.powerUp = 5;
+            player.powerUp = 0;
             player.shootspeed = 0.3;
             player.shootactive = false;
 
@@ -310,16 +305,8 @@ function shoot() {
             friendlyBullets[friendlyBullets.length] = new FriendlyBullet(player.drawX+player.width, player.drawY+player.heigth*size_scale/2, 0, true);
             missileTimer = new Date();
         }
+        if (player.powerUp >= 5) laser = new Laser(player.drawX+player.width);
         setTimeout(shoot, player.shootspeed*1000);
-    }else{
-        player.shootactive = false;
-    }
-}
-
-function shootLaser() {
-    player.shootactive = true;
-    if (player.is_spacekey){
-        laser = new Laser(player.drawX+player.width);
     }else{
         player.shootactive = false;
     }
@@ -400,7 +387,7 @@ Enemy.prototype.ai = function () {
 
     this.drawY += (this.speed*2)*this.direction;
 
-    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/10)+1) && this.exploded == false) {
+    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/100)+1) && this.exploded == false) {
         this.shootTime = Math.floor(new Date()/1000);
         bullets[bullets.length] = new Bullet(this.drawX-(this.width*size_scale/2), this.drawY+(this.heigth*size_scale/2));
     }
@@ -451,7 +438,7 @@ function Bullet(x, y) {
     this.speed = 6;
     this.exploded = false;
     this.firstIteration = true;
-    playLaser();
+    playBullet();
 
 }
 Bullet.prototype.draw = function() {
@@ -473,10 +460,10 @@ Bullet.prototype.draw = function() {
 }
 
 //Quelle: https://stackoverflow.com/questions/6893080/html5-audio-play-sound-repeatedly-on-click-regardless-if-previous-iteration-h
-function playLaser() {
-    var laserShot = laserSound.cloneNode();
-    laserShot.volume=0.025;
-    laserShot.play();
+function playBullet() {
+    var bulletShot = bulletSound.cloneNode();
+    bulletShot.volume=0.025;
+    bulletShot.play();
 }
 
 function playRocket() {
@@ -512,7 +499,7 @@ function FriendlyBullet(x, y, speedY, missile) {
         this.playerPosition = player.drawY;
     }
 
-    if (!this.missile) playLaser();
+    if (!this.missile) playBullet();
     else playRocket();
 
 }
@@ -552,7 +539,7 @@ FriendlyBullet.prototype.draw = function() {
         }
 
     }
-    if (this.exploded) {
+    if (this.exploded || this.drawX > 800) {
         this.drawY = 1337;
         this.drawX = -1337;
         this.speed = 0;
@@ -712,7 +699,7 @@ function loop(){
             music.play();
         }
 
-        laser.draw();
+        if (laser != null) laser.draw();
 
         for (var i = 0; i < powerUp.length; i++) {
             powerUp[i].draw();
