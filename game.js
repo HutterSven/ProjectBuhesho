@@ -32,7 +32,7 @@ var fontLevel;
 var fontScore;
 var fontButton;
 var fontTitle;
-var bullets;
+var enemyBullets;
 var friendlyBullets;
 var enemiesSpawning;
 var score;
@@ -48,12 +48,14 @@ init();
 function init() {
     background_canvas = document.getElementById('space_canvas');
     background_ctx = background_canvas.getContext('2d');
-    main_canvas = document.getElementById('main_canvas');
-    main_ctx = main_canvas.getContext('2d');
+    bullet_canvas = document.getElementById('bullet_canvas');
+    bullet_ctx = bullet_canvas.getContext('2d');
     player_canvas = document.getElementById('player_canvas');
     player_ctx = player_canvas.getContext('2d');
     enemy_canvas = document.getElementById('enemy_canvas');
     enemy_ctx = enemy_canvas.getContext('2d');
+    explosion_canvas = document.getElementById('explosion_canvas');
+    explosion_ctx = explosion_canvas.getContext('2d');
     city_canvas_layer1 = document.getElementById('city_canvas_layer1');
     city_layer1_ctx =  city_canvas_layer1.getContext('2d');
     city_canvas_layer2 = document.getElementById('city_canvas_layer2');
@@ -79,7 +81,7 @@ function init() {
     })();
     player = new Player();
     enemies = [];
-    bullets = [];
+    enemyBullets = [];
     friendlyBullets = [];
     powerUp = [];
     enemiesSpawning = 3;
@@ -144,87 +146,20 @@ Player.prototype.draw = function(){
     player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
 
     if (this.exploded) {
-/*        isDead = true;
-        is_playing = false;
-        in_level = false;
-        this.is_spacekey = false;
-        explode1(this.drawX, this.drawY,1,false);
+               isDead = true;
+                is_playing = false;
+                in_level = false;
+                this.is_spacekey = false;
+                explode1(this.drawX, this.drawY);
 
-        explodeAll();
+                explodeAll();
 
-        this.gameOverTimer = new Date() / 1000;
-        player_ctx.clearRect(0,0,800,600);
-        highScore_ctx.clearRect(0,0,800,600);
-        main_ctx.clearRect(0,0,800,600);*/
+                this.gameOverTimer = new Date() / 1000;
+                player_ctx.clearRect(0,0,800,600);
+                enemy_ctx.clearRect(0,0,800,600);
+                highScore_ctx.clearRect(0,0,800,600);
 
     }
-}
-
-function explode1(x, y, scale, missileExplosion) {
-    this.scale = scale;
-    if (!missileExplosion) this.scale = 1;
-    enemy_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15*size_scale*this.scale, 13*size_scale*this.scale);
-    playExplosion();
-    setTimeout(function(){explode2(x,y, this.scale)}, 80);
-}
-
-function explode2(x, y, scale) {
-    width = 21*size_scale*scale;
-    height = 20*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, width, height);
-    setTimeout(function(){explode3(x, y, scale)}, 80);
-}
-
-function explode3(x, y, scale) {
-    width = 26*size_scale*scale;
-    height = 27*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26*size_scale*scale, 27*size_scale*scale);
-    setTimeout(function(){explode4(x, y, scale)}, 80);
-}
-
-function explode4(x, y, scale) {
-    width = 28*size_scale*scale;
-    height = 29*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28*size_scale*scale, 29*size_scale*scale);
-    setTimeout(function(){explode5(x, y, scale)}, 80);
-}
-
-function explode5(x, y, scale) {
-    width = 31*size_scale*scale;
-    height = 30*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31*size_scale*scale, 30*size_scale*scale);
-    setTimeout(function(){explode6(x, y, scale)}, 80);
-}
-
-function explode6(x, y, scale) {
-    width = 32*size_scale*scale;
-    height = 32*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale)
-    setTimeout(function(){explode7(x, y,scale)}, 80);
-}
-
-function explode7(x, y, scale) {
-    width = 32*size_scale*scale;
-    height = 32*size_scale*scale;
-    clearExplosion(x, y, width, height);
-    enemy_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32*size_scale*scale, 32*size_scale*scale);
-    setTimeout(function(){explode8(x, y, scale)}, 80);
-}
-
-function explode8(x, y, scale) {
-    width = 31*size_scale*scale;
-    height = 31*size_scale*scale;
-    enemy_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31*size_scale*scale, 31*size_scale*scale);
-    clearExplosion(0, 0, 800, 600);
-}
-
-function clearExplosion(x, y, width, height) {
-    enemy_ctx.clearRect(x,y,width,height);
 }
 
 Player.prototype.check_keys = function (){
@@ -263,7 +198,7 @@ Player.prototype.check_keys = function (){
     if(this.is_spacekey && !in_level && !is_playing && !inSequence) {
         if (new Date() / 1000 - this.gameOverTimer > 1) {
             enemies = [];
-            bullets = [];
+            enemyBullets = [];
             friendlyBullets = [];
             powerUp = [];
             in_level = true;
@@ -312,171 +247,6 @@ function shoot() {
     }
 }
 
-function Enemy(y, x, type, moving) {
-    this.drawX = x;
-    this.drawY = y;
-    this.srcY = 176;
-    this.srcX = 15;
-    this.width = 19;
-    this.heigth = 16;
-    this.type = type;
-    this.moving = moving;
-    this.hits = 1;
-    this.distanceY = this.drawY;
-    this.direction = 1;
-    this.shootTime = Math.floor(new Date() / 1000);
-    if (this.type == 2) {
-        this.srcY = 170;
-        this.srcX = 153;
-        this.width = 30;
-        this.heigth = 32;
-        this.hits = 3;
-    }
-    this.speed = 1;
-    this.exploded = false;
-    this.firstIteration = true;
-    this.hitType = 0;
-}
-
-Enemy.prototype.draw = function(){
-    this.ai();
-    if (this.exploded == false) {
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
-    }
-
-    if (this.exploded && this.firstIteration == false) {
-        this.drawY = -3000;
-        this.drawX = -3000;
-        this.heigth = 0;
-        this.width = 0;
-    }
-
-    if (checkHit(this, player)) {
-        this.exploded = true;
-        this.hitType = 1;
-    }
-
-    if (this.exploded && this.firstIteration) {
-
-        explode1(this.drawX, this.drawY, 1, false);
-
-        this.firstIteration = false;
-
-        if (this.hitType == 1) {
-            player.exploded = true;
-        }
-    }
-}
-
-function checkHit(object1, object2) {
-    return ((object1.drawX <= object2.drawX + object2.width*size_scale && object1.drawX >= object2.drawX || object1.drawX+object1.width <= object2.drawX + object2.width*size_scale && object1.drawX+object1.width*size_scale >= object2.drawX)
-        && (object1.drawY <= object2.drawY + object2.heigth*size_scale && object1.drawY >= object2.drawY || object1.drawY+object1.heigth <= object2.drawY + object2.heigth*size_scale && object1.drawY+object1.heigth*size_scale >= object2.drawY));
-}
-
-Enemy.prototype.ai = function () {
-    this.drawX -= this.speed;
-    if (!this.moving) {
-        this.direction = 0;
-    }
-    else if (this.moving && this.distanceY - this.drawY >= 75) {
-        this.direction = 1;
-    }
-    else if (this.moving && this.distanceY - this.drawY <= -75) {
-        this.direction = -1;
-    }
-
-    this.drawY += (this.speed*2)*this.direction;
-
-    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/100)+1) && this.exploded == false) {
-        this.shootTime = Math.floor(new Date()/1000);
-        bullets[bullets.length] = new Bullet(this.drawX-(this.width*size_scale/2), this.drawY+(this.heigth*size_scale/2));
-    }
-}
-
-function PowerUp(y, x) {
-    this.drawX = x;
-    this.drawY = y;
-    this.srcY = 434;
-    this.srcX = 192;
-    this.width = 10;
-    this.heigth = 10;
-    this.speed = 2;
-    this.gotted = false;
-    this.firstIteration = true;
-}
-
-PowerUp.prototype.draw = function(){
-    if (this.gotted == false) {
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*2*size_scale, this.heigth*2*size_scale);
-    }
-
-    this.drawX-=this.speed;
-
-    if (checkHit(this, player)) {
-        this.gotted = true;
-    }
-
-    if (this.gotted && this.firstIteration) {
-        player.powerUp++;
-        itemSound.volume = 1;
-        itemSound.play();
-        this.drawY = -3000;
-        this.drawX = -3000;
-        this.heigth = 0;
-        this.width = 0;
-        this.firstIteration = false;
-    }
-}
-
-function Bullet(x, y) {
-    this.drawX = x;
-    this.drawY = y;
-    this.srcX = 208;
-    this.srcY = 119;
-    this.width = 11;
-    this.heigth = 3;
-    this.speed = 6;
-    this.exploded = false;
-    this.firstIteration = true;
-    playBullet();
-
-}
-Bullet.prototype.draw = function() {
-    if (this.exploded == false) {
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
-    }
-    this.drawX -= this.speed;
-
-    if (checkHit(this, player)) {
-        this.exploded = true;
-    }
-
-    if (this.exploded && this.firstIteration && !inSequence) {
-
-        this.firstIteration = false;
-
-        player.exploded = true;
-    }
-}
-
-//Quelle: https://stackoverflow.com/questions/6893080/html5-audio-play-sound-repeatedly-on-click-regardless-if-previous-iteration-h
-function playBullet() {
-    var bulletShot = bulletSound.cloneNode();
-    bulletShot.volume=0.025;
-    bulletShot.play();
-}
-
-function playRocket() {
-    var rocket = rocketSound.cloneNode();
-    rocket.volume=0.2;
-    rocket.play();
-}
-
-function playExplosion() {
-    var explosion = explosionSound.cloneNode();
-    explosion.volume=0.25;
-    explosion.play();
-}
 
 function FriendlyBullet(x, y, speedY, missile) {
     this.drawX = x;
@@ -501,11 +271,11 @@ function FriendlyBullet(x, y, speedY, missile) {
 
     if (!this.missile) playBullet();
     else playRocket();
-
 }
+
 FriendlyBullet.prototype.draw = function() {
     if (this.exploded == false) {
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
+        bullet_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
     }
 
     if (this.drawY >= 600 || this.drawY <= 0) {this.speedY*=-1;};
@@ -522,9 +292,9 @@ FriendlyBullet.prototype.draw = function() {
     for (var i = 0; i < enemies.length; i++) {
 
         if (checkHit(this, enemies[i])) {
-                if (!this.missile) {
-                    this.exploded = true;
-                }
+            if (!this.missile) {
+                this.exploded = true;
+            }
         }
 
         if ((this.exploded && this.firstIteration) || (this.missile && checkHit(this, enemies[i]))) {
@@ -560,7 +330,7 @@ Laser.prototype.draw = function() {
     if (player.is_spacekey) {
         this.drawX = player.drawX + player.width;
         this.drawY = player.drawY + player.heigth/2 + this.heigth -3 ;
-        main_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*150, this.heigth*size_scale*2);
+        bullet_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*150, this.heigth*size_scale*2);
     }
 
     for (var i = 0; i < enemies.length; i++) {
@@ -574,15 +344,157 @@ Laser.prototype.draw = function() {
     }
 }
 
-function spawn_enemy(n, moving) {
-        var y_position = 600 / (n + 1);
-        type = 1;
+function Enemy(y, x, type, moving) {
+    this.drawX = x;
+    this.drawY = y;
+    this.srcY = 176;
+    this.srcX = 15;
+    this.width = 19;
+    this.heigth = 16;
+    this.type = type;
+    this.moving = moving;
+    this.hits = 1;
+    this.distanceY = this.drawY;
+    this.direction = 1;
+    this.shootTime = Math.floor(new Date() / 1000);
+    if (this.type == 2) {
+        this.srcY = 170;
+        this.srcX = 153;
+        this.width = 30;
+        this.heigth = 32;
+        this.hits = 3;
+    }
+    this.speed = 1;
+    this.exploded = false;
+    this.firstIteration = true;
+    this.hitType = 0;
+}
 
-        if (level > 1) type = Math.floor(Math.random() * 2) + 1;
+Enemy.prototype.draw = function(){
+    this.ai();
+    if (this.exploded == false) {
+        enemy_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
+    }
 
-        for (var i = 0; i < n; i++) {
-            enemies[enemies.length] = new Enemy(y_position * (i + 1), Math.floor(Math.random() * 100) + 830, type, moving);
+    if (this.exploded && this.firstIteration == false) {
+        this.drawY = -3000;
+        this.drawX = -3000;
+        this.heigth = 0;
+        this.width = 0;
+    }
+
+    if (checkHit(this, player)) {
+        this.exploded = true;
+        this.hitType = 1;
+    }
+
+    if (this.exploded && this.firstIteration) {
+
+        explode1(this.drawX, this.drawY);
+
+        this.firstIteration = false;
+
+        if (this.hitType == 1) {
+            player.exploded = true;
         }
+    }
+}
+
+Enemy.prototype.ai = function () {
+    this.drawX -= this.speed;
+    if (!this.moving) {
+        this.direction = 0;
+    }
+    else if (this.moving && this.distanceY - this.drawY >= 75) {
+        this.direction = 1;
+    }
+    else if (this.moving && this.distanceY - this.drawY <= -75) {
+        this.direction = -1;
+    }
+
+    this.drawY += (this.speed*2)*this.direction;
+
+    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/100)+1) && this.exploded == false) {
+        this.shootTime = Math.floor(new Date()/1000);
+        enemyBullets[enemyBullets.length] = new EnemyBullet(this.drawX-(this.width*size_scale/2), this.drawY+(this.heigth*size_scale/2));
+    }
+}
+
+function spawn_enemy(n, moving) {
+    var y_position = 600 / (n + 1);
+    type = 1;
+
+    if (level > 1) type = Math.floor(Math.random() * 2) + 1;
+
+    for (var i = 0; i < n; i++) {
+        enemies[enemies.length] = new Enemy(y_position * (i + 1), Math.floor(Math.random() * 100) + 830, type, moving);
+    }
+}
+
+function EnemyBullet(x, y) {
+    this.drawX = x;
+    this.drawY = y;
+    this.srcX = 208;
+    this.srcY = 119;
+    this.width = 11;
+    this.heigth = 3;
+    this.speed = 6;
+    this.exploded = false;
+    this.firstIteration = true;
+    playBullet();
+
+}
+EnemyBullet.prototype.draw = function() {
+    if (this.exploded == false) {
+        bullet_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
+    }
+    this.drawX -= this.speed;
+
+    if (checkHit(this, player)) {
+        this.exploded = true;
+    }
+
+    if (this.exploded && this.firstIteration && !inSequence) {
+
+        this.firstIteration = false;
+
+        player.exploded = true;
+    }
+}
+
+function PowerUp(y, x) {
+    this.drawX = x;
+    this.drawY = y;
+    this.srcY = 434;
+    this.srcX = 192;
+    this.width = 10;
+    this.heigth = 10;
+    this.speed = 2;
+    this.gotted = false;
+    this.firstIteration = true;
+}
+
+PowerUp.prototype.draw = function(){
+    if (this.gotted == false) {
+        player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*2*size_scale, this.heigth*2*size_scale);
+    }
+
+    this.drawX-=this.speed;
+
+    if (checkHit(this, player)) {
+        this.gotted = true;
+    }
+
+    if (this.gotted && this.firstIteration) {
+        player.powerUp++;
+        itemSound.volume = 1;
+        itemSound.play();
+        this.drawY = -3000;
+        this.drawX = -3000;
+        this.heigth = 0;
+        this.width = 0;
+        this.firstIteration = false;
+    }
 }
 
 function loop(){
@@ -643,8 +555,8 @@ function loop(){
     }
 
     if (is_playing) {
-
-        main_ctx.clearRect(0, 0, 800, 600);
+        bullet_ctx.clearRect(0, 0, 800, 600);
+        enemy_ctx.clearRect(0, 0, 800, 600);
         player_ctx.clearRect(0, 0, 800, 600);
         highScore_ctx.clearRect(0, 0, 800, 600);
         highScore_ctx.fillText("Score: " + score, 20, 40);
@@ -665,7 +577,7 @@ function loop(){
 
         if (new Date() / 1000 - startTime >= 3 && inSequence) {
             powerUp = [];
-            bullets = [];
+            enemyBullets = [];
             friendlyBullets = [];
             enemies = [];
             levelText_ctx.clearRect(0, 0, 800, 600);
@@ -708,8 +620,8 @@ function loop(){
         for (var i = 0; i < enemies.length; i++) {
             enemies[i].draw();
         }
-        for (var i = 0; i < bullets.length; i++) {
-            bullets[i].draw();
+        for (var i = 0; i < enemyBullets.length; i++) {
+            enemyBullets[i].draw();
         }
 
         for (var i = 0; i < friendlyBullets.length; i++) {
@@ -730,13 +642,22 @@ function loop(){
     requestaframe(loop);
 }
 
+
+function checkHit(object1, object2) {
+    return ((object1.drawX <= object2.drawX + object2.width*size_scale && object1.drawX >= object2.drawX
+        || object1.drawX+object1.width <= object2.drawX + object2.width*size_scale && object1.drawX+object1.width*size_scale >= object2.drawX)
+        && (object1.drawY <= object2.drawY + object2.heigth*size_scale && object1.drawY >= object2.drawY
+        || object1.drawY+object1.heigth <= object2.drawY + object2.heigth*size_scale && object1.drawY+object1.heigth*size_scale >= object2.drawY));
+}
+
+
 function explodeAll() {
     for (var i = 0; i < enemies.length; i++) {
         enemies[i].exploded = true;
     }
 
-    for (var i = 0; i < bullets.length; i++) {
-        bullets[i].exploded = true;
+    for (var i = 0; i < enemyBullets.length; i++) {
+        enemyBullets[i].exploded = true;
     }
 
     for (var i = 0; i < powerUp.length; i++) {
@@ -839,4 +760,88 @@ function key_up(e) {
         player.is_spacekey = false;
         e.preventDefault();
     }
+}
+
+//Quelle: https://stackoverflow.com/questions/6893080/html5-audio-play-sound-repeatedly-on-click-regardless-if-previous-iteration-h
+function playBullet() {
+    var bulletShot = bulletSound.cloneNode();
+    bulletShot.volume=0.025;
+    bulletShot.play();
+}
+
+function playRocket() {
+    var rocket = rocketSound.cloneNode();
+    rocket.volume=0.2;
+    rocket.play();
+}
+
+function playExplosion() {
+    var explosion = explosionSound.cloneNode();
+    explosion.volume=0.25;
+    explosion.play();
+}
+
+function explode1(x, y) {
+    explosion_ctx.drawImage(main_sprite, 8, 137, 15, 13, x, y, 15*size_scale, 13*size_scale);
+    playExplosion();
+    setTimeout(function(){explode2(x,y)}, 80);
+}
+
+function explode2(x, y) {
+    width = 21*size_scale;
+    height = 20*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 37, 134, 21, 20, x, y, width, height);
+    setTimeout(function(){explode3(x, y)}, 80);
+}
+
+function explode3(x, y) {
+    width = 26*size_scale;
+    height = 27*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 66, 131, 26, 27, x, y, 26*size_scale, 27*size_scale);
+    setTimeout(function(){explode4(x, y)}, 80);
+}
+
+function explode4(x, y) {
+    width = 28*size_scale;
+    height = 29*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 98, 129, 28, 29, x, y, 28*size_scale, 29*size_scale);
+    setTimeout(function(){explode5(x, y)}, 80);
+}
+
+function explode5(x, y) {
+    width = 31*size_scale;
+    height = 30*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 128, 129, 31, 30, x, y, 31*size_scale, 30*size_scale);
+    setTimeout(function(){explode6(x, y)}, 80);
+}
+
+function explode6(x, y) {
+    width = 32*size_scale;
+    height = 32*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 160, 128, 32, 32, x, y, 32*size_scale, 32*size_scale)
+    setTimeout(function(){explode7(x, y)}, 80);
+}
+
+function explode7(x, y) {
+    width = 32*size_scale;
+    height = 32*size_scale;
+    clearExplosion(x, y, width, height);
+    explosion_ctx.drawImage(main_sprite, 192, 128, 32, 32, x, y, 32*size_scale, 32*size_scale);
+    setTimeout(function(){explode8(x, y)}, 80);
+}
+
+function explode8(x, y) {
+    width = 31*size_scale;
+    height = 31*size_scale;
+    explosion_ctx.drawImage(main_sprite, 225, 129, 31, 31, x, y, 31*size_scale, 31*size_scale);
+    clearExplosion(0, 0, 800, 600);
+}
+
+function clearExplosion(x, y, width, height) {
+    explosion_ctx.clearRect(x,y,width,height);
 }
