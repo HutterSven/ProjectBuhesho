@@ -42,7 +42,8 @@ var spawnEnemy;
 var spawnPowerup;
 var missileTimer;
 var laser;
-
+var enemySpawnTime = 4000;
+var enemyBulletSpawn = 2000;
 init();
 
 function init() {
@@ -128,7 +129,7 @@ function Player() {
     this.srcX = 62;
     this.width = 21;
     this.heigth = 23;
-    this.speed = 6;
+    this.speed = 5;
     this.is_downkey = false;
     this.is_upkey = false;
     this.is_leftkey = false;
@@ -146,7 +147,8 @@ Player.prototype.draw = function(){
     player_ctx.drawImage(main_sprite, this.srcX, this.srcY, this.width, this.heigth, this.drawX, this.drawY, this.width*size_scale, this.heigth*size_scale);
 
     if (this.exploded) {
-               isDead = true;
+                /*
+                isDead = true;
                 is_playing = false;
                 in_level = false;
                 this.is_spacekey = false;
@@ -158,7 +160,7 @@ Player.prototype.draw = function(){
                 player_ctx.clearRect(0,0,800,600);
                 enemy_ctx.clearRect(0,0,800,600);
                 highScore_ctx.clearRect(0,0,800,600);
-
+*/
     }
 }
 
@@ -172,11 +174,13 @@ Player.prototype.check_keys = function (){
     };
 
     if(this.is_rightkey && this.drawX <= 750){
-        this.drawX+=this.speed;
+        this.drawX += this.speed;
+
     };
 
     if(this.is_leftkey && this.drawX >= 20){
-        this.drawX-=this.speed;
+        this.drawX -= this.speed;
+
     };
 
     if(this.is_spacekey && in_level){
@@ -414,8 +418,8 @@ Enemy.prototype.ai = function () {
 
     this.drawY += (this.speed*2)*this.direction;
 
-    if (new Date()/1000 - this.shootTime >= 1.5 / ((level/100)+1) && this.exploded == false) {
-        this.shootTime = Math.floor(new Date()/1000);
+    if (new Date() - this.shootTime >= enemyBulletSpawn / (1+level/10) && this.exploded == false) {
+        this.shootTime = Math.floor(new Date());
         enemyBullets[enemyBullets.length] = new EnemyBullet(this.drawX-(this.width*size_scale/2), this.drawY+(this.heigth*size_scale/2));
     }
 }
@@ -541,9 +545,14 @@ function loop(){
             city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 275);
             city_layer2_ctx.font = fontButton;
             city_layer2_ctx.fillStyle = 'white';
+            messageText = "Pay2Win-Edition";
+            textWidth = city_layer2_ctx.measureText(messageText).width;
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 360);
+            city_layer2_ctx.font = fontButton;
+            city_layer2_ctx.fillStyle = 'white';
             messageText = "Press SPACE to play";
             textWidth = city_layer2_ctx.measureText(messageText).width;
-            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 400);
+            city_layer2_ctx.fillText(messageText , (city_canvas_layer2.width/2) - (textWidth / 2), 425);
         }
 
         spacePos -= 1;
@@ -563,7 +572,7 @@ function loop(){
 
         if (new Date() / 1000 - startTime >= 30) {
             level++;
-            if (enemiesSpawning < 7) enemiesSpawning = level * 3;
+            if (enemiesSpawning < 5) enemiesSpawning = level * 3;
             in_level = false;
             inSequence = true;
             speedCity1 *= 4;
@@ -580,6 +589,7 @@ function loop(){
             enemyBullets = [];
             friendlyBullets = [];
             enemies = [];
+            player.is_spacekey = false;
             levelText_ctx.clearRect(0, 0, 800, 600);
             speedCity1 = 4;
             speedCity2 = 5;
@@ -595,8 +605,8 @@ function loop(){
 
         player.draw();
 
-        if (Math.floor(new Date()/1000 - spawnEnemy) == 3 && !inSequence) {
-            spawnEnemy = Math.floor(new Date() / 1000);
+        if (Math.floor(new Date() - spawnEnemy) >= enemySpawnTime && !inSequence) {
+            spawnEnemy = Math.floor(new Date());
             spawn_enemy(Math.floor(Math.random() * enemiesSpawning) + 1, Math.random() < 0.5);
         }
 
